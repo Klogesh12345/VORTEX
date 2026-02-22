@@ -1,150 +1,103 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>VORTEX Telemetry</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body{
-            margin:0;
-            font-family:Arial, Helvetica, sans-serif;
-            color:white;
-            text-align:center;
-
-            /* YOUR CAR BACKGROUND */
-            background:url("145.jpg") no-repeat center center fixed;
-            background-size:cover;
-        }
-
-        /* Dark overlay */
-        body::before{
-            content:"";
-            position:fixed;
-            inset:0;
-            background:rgba(0,0,0,0.75);
-            z-index:-1;
-        }
-
-        .dashboard-title{
-            padding:20px;
-            font-size:32px;
-            color:#e0aaff;
-            text-shadow:0 0 15px #c77dff;
-        }
-
-        .grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
-            gap:20px;
-            padding:20px;
-        }
-
-        .card{
-            background:rgba(20,0,40,0.9);
-            padding:20px;
-            border-radius:15px;
-            border:1px solid #3a0066;
-            box-shadow:0 0 20px rgba(157,78,221,0.4);
-        }
-
-        .card h2{
-            color:#e0aaff;
-        }
-
-        canvas{
-            margin:10px 0;
-            background:#0f021d;
-            border-radius:10px;
-        }
-    </style>
-</head>
-
-<body>
-
-<h1 class="dashboard-title">VORTEX LIVE TELEMETRY</h1>
-
-<div class="grid">
-
-    <div class="card">
-        <h2>Powertrain</h2>
-        <canvas id="rpm"></canvas>
-        <canvas id="throttle"></canvas>
-    </div>
-
-    <div class="card">
-        <h2>Electrical</h2>
-        <canvas id="battery"></canvas>
-    </div>
-
-    <div class="card">
-        <h2>Suspension</h2>
-        <canvas id="suspension"></canvas>
-    </div>
-
-    <div class="card">
-        <h2>Brakes</h2>
-        <canvas id="brake"></canvas>
-    </div>
-
-</div>
-
-<script>
-
-function createChart(id,label,max){
-    return new Chart(document.getElementById(id),{
-        type:'line',
-        data:{
-            labels:[],
-            datasets:[{
-                label:label,
-                data:[],
-                borderColor:'#c77dff',
-                backgroundColor:'rgba(199,125,255,0.2)',
-                tension:0.4,
-                fill:true
-            }]
-        },
-        options:{
-            responsive:true,
-            plugins:{
-                legend:{labels:{color:'white'}}
-            },
-            scales:{
-                x:{ticks:{color:'white'}},
-                y:{min:0,max:max,ticks:{color:'white'}}
-            }
-        }
-    });
+/* Global */
+body{
+margin:0;
+font-family:Segoe UI, Arial, sans-serif;
+color:white;
+text-align:center;
+background:#0a0f1f;
 }
 
-let rpmChart=createChart("rpm","RPM",12000);
-let throttleChart=createChart("throttle","Throttle %",100);
-let batteryChart=createChart("battery","Battery Voltage",15);
-let suspensionChart=createChart("suspension","Suspension Travel (mm)",100);
-let brakeChart=createChart("brake","Brake Pressure (bar)",10);
-
-function update(chart,value){
-    let time=new Date().toLocaleTimeString();
-
-    if(chart.data.labels.length>15){
-        chart.data.labels.shift();
-        chart.data.datasets[0].data.shift();
-    }
-
-    chart.data.labels.push(time);
-    chart.data.datasets[0].data.push(value);
-    chart.update();
+/* Layout */
+.container{
+max-width:1100px;
+margin:auto;
+padding:40px 20px;
 }
 
-setInterval(()=>{
-    update(rpmChart,7000+Math.random()*4000);
-    update(throttleChart,Math.random()*100);
-    update(batteryChart,12+Math.random()*2);
-    update(suspensionChart,Math.random()*80);
-    update(brakeChart,Math.random()*8);
-},1000);
+.center{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+}
 
-</script>
+/* Background Themes */
+.splash{
+background:linear-gradient(135deg,#2b0a5c,#0d1b4c,#000814);
+}
 
-</body>
-</html>
+.launch{
+background:linear-gradient(135deg,#1a0033,#00296b,#000814);
+}
+
+.dashboard{
+background:linear-gradient(135deg,#0a0f1f,#1a0033,#001d3d);
+}
+
+/* Typography */
+.title{
+font-size:60px;
+letter-spacing:5px;
+color:#9d4edd;
+text-shadow:0 0 20px #7b2cff;
+}
+
+.title-large{
+font-size:75px;
+color:#7b2cff;
+text-shadow:0 0 25px #3a86ff;
+}
+
+.subtitle{
+letter-spacing:3px;
+color:#3a86ff;
+}
+
+/* Buttons */
+.btn-primary{
+display:inline-block;
+padding:15px 40px;
+margin-top:30px;
+background:linear-gradient(90deg,#7b2cff,#3a86ff);
+border-radius:8px;
+color:white;
+text-decoration:none;
+font-weight:600;
+transition:0.3s;
+}
+
+.btn-primary:hover{
+transform:scale(1.05);
+box-shadow:0 0 25px #3a86ff;
+}
+
+/* Dashboard */
+header{
+padding:20px;
+font-size:28px;
+color:#7b2cff;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(350px,1fr));
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:rgba(20,20,50,0.9);
+padding:20px;
+border-radius:15px;
+box-shadow:0 0 20px rgba(58,134,255,0.4);
+}
+
+.card h2{
+color:#3a86ff;
+}
+
+canvas{
+background:#0a0f1f;
+border-radius:10px;
+margin-top:10px;
+}
