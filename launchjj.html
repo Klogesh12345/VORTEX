@@ -1,45 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>VORTEX Telemetry</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VORTEX Telemetry</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="style.css">
 </head>
-<body>
 
-<h1 class="dashboard-title">VORTEX LIVE TELEMETRY</h1>
+<body class="dashboard">
 
-<div class="grid">
+<header>
+    <h1>VORTEX LIVE TELEMETRY</h1>
+</header>
 
-<!-- POWERTRAIN -->
-<div class="card">
+<main class="grid">
+
+<section class="card">
 <h2>Powertrain</h2>
 <canvas id="rpm"></canvas>
 <canvas id="throttle"></canvas>
-<canvas id="map"></canvas>
-<canvas id="coolant"></canvas>
-</div>
+</section>
 
-<!-- ELECTRICAL -->
-<div class="card">
+<section class="card">
 <h2>Electrical</h2>
 <canvas id="battery"></canvas>
-<canvas id="fuse"></canvas>
-</div>
+</section>
 
-<!-- SUSPENSION -->
-<div class="card">
+<section class="card">
 <h2>Suspension</h2>
 <canvas id="suspension"></canvas>
-</div>
+</section>
 
-<!-- BRAKES -->
-<div class="card">
+<section class="card">
 <h2>Brakes</h2>
 <canvas id="brake"></canvas>
-</div>
+</section>
 
-</div>
+</main>
 
 <script>
 
@@ -51,28 +49,31 @@ labels:[],
 datasets:[{
 label:label,
 data:[],
-borderColor:'#c77dff',
-tension:0.4
+borderColor:'#7b2cff',
+backgroundColor:'rgba(0,120,255,0.2)',
+tension:0.4,
+fill:true
 }]
 },
 options:{
 responsive:true,
-scales:{y:{min:0,max:max}}
+plugins:{legend:{labels:{color:'white'}}},
+scales:{
+x:{ticks:{color:'white'}},
+y:{min:0,max:max,ticks:{color:'white'}}
+}
 }
 });
 }
 
-let rpmChart=createChart("rpm","RPM",12000);
-let throttleChart=createChart("throttle","Throttle %",100);
-let mapChart=createChart("map","Manifold Pressure (kPa)",200);
-let coolantChart=createChart("coolant","Coolant Temp °C",120);
-let batteryChart=createChart("battery","Battery Voltage",15);
-let fuseChart=createChart("fuse","Fuse Output (A)",30);
-let suspensionChart=createChart("suspension","Suspension Travel (mm)",100);
-let brakeChart=createChart("brake","Brake Pressure (bar)",10);
+const rpm=createChart("rpm","RPM",12000);
+const throttle=createChart("throttle","Throttle %",100);
+const battery=createChart("battery","Battery Voltage",15);
+const suspension=createChart("suspension","Suspension Travel (mm)",100);
+const brake=createChart("brake","Brake Pressure (bar)",10);
 
 function update(chart,value){
-let time=new Date().toLocaleTimeString();
+const time=new Date().toLocaleTimeString();
 
 if(chart.data.labels.length>20){
 chart.data.labels.shift();
@@ -85,14 +86,11 @@ chart.update();
 }
 
 setInterval(()=>{
-update(rpmChart,7000+Math.random()*4000);
-update(throttleChart,Math.random()*100);
-update(mapChart,80+Math.random()*40);
-update(coolantChart,80+Math.random()*20);
-update(batteryChart,12+Math.random()*2);
-update(fuseChart,Math.random()*20);
-update(suspensionChart,Math.random()*80);
-update(brakeChart,Math.random()*8);
+update(rpm,7000+Math.random()*4000);
+update(throttle,Math.random()*100);
+update(battery,12+Math.random()*2);
+update(suspension,Math.random()*80);
+update(brake,Math.random()*8);
 },1000);
 
 </script>
