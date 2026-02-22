@@ -3,75 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAKTHI RACING | International Telemetry</title>
+<title>SAKTHI RACING VORTEX | Formula Student</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
 <style>
 body{
     margin:0;
-    font-family: 'Segoe UI', sans-serif;
     background:#0a0f1c;
     color:white;
+    font-family:Arial, Helvetica, sans-serif;
 }
 
 header{
-    background:#111a2e;
-    padding:15px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:2px solid #ff6b00;
+    background:linear-gradient(90deg,#ff6b00,#ff0000);
+    padding:20px;
+    text-align:center;
 }
 
 header h1{
     margin:0;
-    font-size:22px;
-    letter-spacing:2px;
-    color:#ff6b00;
+    font-size:28px;
+    letter-spacing:3px;
 }
 
-.status{
+header p{
+    margin:5px 0 0;
     font-weight:bold;
-    color:lime;
+}
+
+.launch-banner{
+    text-align:center;
+    background:#111a2e;
+    padding:10px;
+    font-size:18px;
+    color:#ff6b00;
+    letter-spacing:2px;
 }
 
 .dashboard{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(2,1fr);
     gap:20px;
     padding:20px;
 }
 
 .card{
     background:#141c2b;
-    border-radius:12px;
     padding:20px;
+    border-radius:12px;
     border:1px solid #222;
 }
 
 .card h2{
     margin-top:0;
-    font-size:16px;
     color:#ff6b00;
 }
 
-.value{
-    font-size:24px;
-    font-weight:bold;
-}
-
-.critical{
-    background:#5c0000 !important;
-}
-
 canvas{
-    background:#111;
+    background:#0d1322;
     border-radius:10px;
 }
 
-@media(max-width:1000px){
+@media(max-width:900px){
     .dashboard{
         grid-template-columns:1fr;
     }
@@ -81,158 +75,142 @@ canvas{
 <body>
 
 <header>
-<h1>SAKTHI RACING TELEMETRY</h1>
-<div>Status: <span id="connectionStatus" class="status">CONNECTING...</span></div>
+<h1>SAKTHI RACING VORTEX</h1>
+<p>FORMULA STUDENT | VORTEX LAUNCHING 🚀</p>
 </header>
+
+<div class="launch-banner">
+🔥 VORTEX CAR LAUNCH TELEMETRY – LIVE PERFORMANCE MONITORING 🔥
+</div>
 
 <div class="dashboard">
 
-<!-- Powertrain -->
 <div class="card">
-<h2>POWERTRAIN</h2>
-RPM: <div class="value" id="rpm">0</div>
-TPS: <div id="tps">0 %</div>
-Lambda: <div id="lambda">0</div>
-Oil Temp: <div id="oilTemp">0 °C</div>
-Oil Pressure: <div id="oilPressure">0 bar</div>
-</div>
-
-<!-- Brake -->
-<div class="card">
-<h2>BRAKE SYSTEM</h2>
-Front Pressure: <div id="fPress">0 bar</div>
-Rear Pressure: <div id="rPress">0 bar</div>
-Bias: <div id="bias">0 %</div>
-Disc Temp: <div id="discTemp">0 °C</div>
-</div>
-
-<!-- Vehicle Dynamics -->
-<div class="card">
-<h2>VEHICLE DYNAMICS</h2>
-Lat G: <div id="latG">0 g</div>
-Long G: <div id="longG">0 g</div>
-Yaw Rate: <div id="yaw">0 °/s</div>
-Steering: <div id="steering">0 °</div>
-</div>
-
-<!-- EV System -->
-<div class="card">
-<h2>EV SYSTEM</h2>
-Pack Voltage: <div id="voltage">0 V</div>
-Pack Current: <div id="current">0 A</div>
-Motor Temp: <div id="motorTemp">0 °C</div>
-SOC: <div id="soc">0 %</div>
-</div>
-
-<!-- Suspension -->
-<div class="card">
-<h2>SUSPENSION</h2>
-FL: <div id="suspFL">0 mm</div>
-FR: <div id="suspFR">0 mm</div>
-RL: <div id="suspRL">0 mm</div>
-RR: <div id="suspRR">0 mm</div>
-</div>
-
-<!-- RPM Chart -->
-<div class="card">
-<h2>RPM LIVE GRAPH</h2>
+<h2>ENGINE RPM</h2>
 <canvas id="rpmChart"></canvas>
+</div>
+
+<div class="card">
+<h2>BRAKE PRESSURE</h2>
+<canvas id="brakeChart"></canvas>
+</div>
+
+<div class="card">
+<h2>G-FORCE (Vehicle Dynamics)</h2>
+<canvas id="gforceChart"></canvas>
+</div>
+
+<div class="card">
+<h2>BATTERY POWER OUTPUT</h2>
+<canvas id="powerChart"></canvas>
 </div>
 
 </div>
 
 <script>
 
-// MQTT Connection (Replace with your secure broker)
-const client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
-
-const statusText = document.getElementById("connectionStatus");
-
-client.on("connect",()=>{
-    statusText.innerText = "LIVE";
-    statusText.style.color = "lime";
-    client.subscribe("sakthi/#");
-});
-
-client.on("error",()=>{
-    statusText.innerText = "ERROR";
-    statusText.style.color = "red";
-});
-
-client.on("message",(topic,message)=>{
-    const data = JSON.parse(message.toString());
-
-    if(data.powertrain){
-        document.getElementById("rpm").innerText = data.powertrain.rpm;
-        document.getElementById("tps").innerText = data.powertrain.tps + " %";
-        document.getElementById("lambda").innerText = data.powertrain.lambda;
-        document.getElementById("oilTemp").innerText = data.powertrain.oilTemp + " °C";
-        document.getElementById("oilPressure").innerText = data.powertrain.oilPressure + " bar";
-
-        updateChart(data.powertrain.rpm);
-    }
-
-    if(data.brake){
-        document.getElementById("fPress").innerText = data.brake.frontPressure + " bar";
-        document.getElementById("rPress").innerText = data.brake.rearPressure + " bar";
-        document.getElementById("bias").innerText = data.brake.bias + " %";
-        document.getElementById("discTemp").innerText = data.brake.discTemp + " °C";
-    }
-
-    if(data.dynamics){
-        document.getElementById("latG").innerText = data.dynamics.latG + " g";
-        document.getElementById("longG").innerText = data.dynamics.longG + " g";
-        document.getElementById("yaw").innerText = data.dynamics.yaw + " °/s";
-        document.getElementById("steering").innerText = data.dynamics.steering + " °";
-    }
-
-    if(data.ev){
-        document.getElementById("voltage").innerText = data.ev.packVoltage + " V";
-        document.getElementById("current").innerText = data.ev.packCurrent + " A";
-        document.getElementById("motorTemp").innerText = data.ev.motorTemp + " °C";
-        document.getElementById("soc").innerText = data.ev.soc + " %";
-    }
-
-    if(data.suspension){
-        document.getElementById("suspFL").innerText = data.suspension.fl + " mm";
-        document.getElementById("suspFR").innerText = data.suspension.fr + " mm";
-        document.getElementById("suspRL").innerText = data.suspension.rl + " mm";
-        document.getElementById("suspRR").innerText = data.suspension.rr + " mm";
-    }
-});
-
-// Chart Setup
-const ctx = document.getElementById("rpmChart").getContext("2d");
-
-const rpmChart = new Chart(ctx,{
+// ---------- RPM CHART ----------
+const rpmCtx = document.getElementById('rpmChart');
+const rpmChart = new Chart(rpmCtx,{
     type:'line',
     data:{
         labels:[],
         datasets:[{
-            label:"RPM",
+            label:'RPM',
             data:[],
-            borderColor:"#ff6b00",
-            backgroundColor:"rgba(255,107,0,0.2)",
-            tension:0.3
+            borderColor:'#ff6b00',
+            backgroundColor:'rgba(255,107,0,0.2)',
+            tension:0.4
         }]
     },
-    options:{
-        responsive:true,
-        scales:{
-            y:{min:0,max:12000}
-        }
-    }
+    options:{responsive:true,scales:{y:{min:0,max:12000}}}
 });
 
-function updateChart(rpm){
-    if(rpmChart.data.labels.length > 50){
+// ---------- BRAKE CHART ----------
+const brakeCtx = document.getElementById('brakeChart');
+const brakeChart = new Chart(brakeCtx,{
+    type:'line',
+    data:{
+        labels:[],
+        datasets:[
+            {
+                label:'Front Pressure',
+                data:[],
+                borderColor:'#00ffcc'
+            },
+            {
+                label:'Rear Pressure',
+                data:[],
+                borderColor:'#ff4444'
+            }
+        ]
+    },
+    options:{responsive:true}
+});
+
+// ---------- G-FORCE ----------
+const gCtx = document.getElementById('gforceChart');
+const gChart = new Chart(gCtx,{
+    type:'line',
+    data:{
+        labels:[],
+        datasets:[
+            {label:'Lat G',data:[],borderColor:'#00ff00'},
+            {label:'Long G',data:[],borderColor:'#ffff00'}
+        ]
+    },
+    options:{responsive:true,scales:{y:{min:-3,max:3}}}
+});
+
+// ---------- POWER ----------
+const powerCtx = document.getElementById('powerChart');
+const powerChart = new Chart(powerCtx,{
+    type:'line',
+    data:{
+        labels:[],
+        datasets:[
+            {label:'kW Output',data:[],borderColor:'#ff00ff'}
+        ]
+    },
+    options:{responsive:true}
+});
+
+// --------- DEMO DATA SIMULATION ---------
+function updateCharts(){
+    const time = new Date().toLocaleTimeString();
+
+    if(rpmChart.data.labels.length > 20){
         rpmChart.data.labels.shift();
         rpmChart.data.datasets[0].data.shift();
+        brakeChart.data.labels.shift();
+        brakeChart.data.datasets[0].data.shift();
+        brakeChart.data.datasets[1].data.shift();
+        gChart.data.labels.shift();
+        gChart.data.datasets[0].data.shift();
+        gChart.data.datasets[1].data.shift();
+        powerChart.data.labels.shift();
+        powerChart.data.datasets[0].data.shift();
     }
-    rpmChart.data.labels.push("");
-    rpmChart.data.datasets[0].data.push(rpm);
+
+    rpmChart.data.labels.push(time);
+    brakeChart.data.labels.push(time);
+    gChart.data.labels.push(time);
+    powerChart.data.labels.push(time);
+
+    rpmChart.data.datasets[0].data.push(7000 + Math.random()*4000);
+    brakeChart.data.datasets[0].data.push(Math.random()*8);
+    brakeChart.data.datasets[1].data.push(Math.random()*5);
+    gChart.data.datasets[0].data.push((Math.random()*2-1)*2);
+    gChart.data.datasets[1].data.push((Math.random()*2-1)*2);
+    powerChart.data.datasets[0].data.push(40 + Math.random()*60);
+
     rpmChart.update();
+    brakeChart.update();
+    gChart.update();
+    powerChart.update();
 }
+
+setInterval(updateCharts,1000);
 
 </script>
 
