@@ -1,19 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TEAM SAKTHI RACING | PITWALL</title>
+<title>TSR PITWALL SYSTEM</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-
-/* ===== CORE THEME ===== */
 :root{
---black:#0b0b0f;
---dark:#14141a;
+--bg:#0b0b0f;
+--card:#14141a;
 --accent:#ff5c00;
 --blue:#00c2ff;
 --green:#00ff88;
@@ -24,299 +21,260 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-font-family:'Rajdhani',sans-serif;
-background:var(--black);
-color:var(--white);
-overflow-x:hidden;
-}
-
-/* ===== LANDING PAGE ===== */
-.landing{
-min-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-background:
-linear-gradient(rgba(0,0,0,0.75),rgba(0,0,0,0.75)),
-url('145.jpeg') center/cover no-repeat fixed;
-padding:2rem;
-}
-
-.title{
-font-family:'Orbitron';
-font-size:4rem;
-font-weight:900;
-letter-spacing:3px;
-margin-bottom:1rem;
-}
-
-.subtitle{
-font-size:1.2rem;
-opacity:0.8;
-margin-bottom:2rem;
-}
-
-.enter-btn{
-padding:1rem 3rem;
-border:2px solid var(--accent);
-background:transparent;
+background:var(--bg);
 color:white;
+font-family:'Rajdhani';
+display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+width:220px;
+background:#000;
+height:100vh;
+position:fixed;
+left:0;
+top:0;
+border-right:2px solid var(--accent);
+padding-top:20px;
+}
+
+.sidebar h2{
 font-family:'Orbitron';
+text-align:center;
+margin-bottom:30px;
+}
+
+.nav-btn{
+display:block;
+width:100%;
+padding:12px;
+background:none;
+border:none;
+color:white;
+text-align:left;
+padding-left:25px;
 cursor:pointer;
+font-family:'Orbitron';
+font-size:0.85rem;
 transition:0.3s;
 }
 
-.enter-btn:hover{
+.nav-btn:hover{
 background:var(--accent);
 }
 
-/* ===== PITWALL BAR ===== */
-.pitwall{
-position:fixed;
-top:0;
+/* MAIN */
+.main{
+margin-left:220px;
 width:100%;
-background:#000;
-display:flex;
-justify-content:space-between;
-padding:10px 20px;
-font-family:'Orbitron';
-font-size:0.9rem;
-border-bottom:2px solid var(--accent);
-z-index:1000;
+padding:30px;
 }
 
-.live{
-color:var(--green);
-animation:blink 1s infinite alternate;
-}
-
-@keyframes blink{
-from{opacity:0.5;}
-to{opacity:1;}
-}
-
-/* ===== DASHBOARD ===== */
-.dashboard{
+.section{
 display:none;
-padding:80px 2rem 2rem 2rem;
-min-height:100vh;
-background:linear-gradient(135deg,#15151a,#0b0b0f);
 }
 
-.section-title{
-font-family:'Orbitron';
-font-size:1.8rem;
-margin-bottom:2rem;
+.active{
+display:block;
 }
 
-/* ===== GRID ===== */
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:2rem;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
 }
 
 .card{
-background:#111;
+background:var(--card);
+padding:20px;
 border:1px solid #222;
-padding:1.5rem;
 }
 
 .card h3{
 font-family:'Orbitron';
-font-size:0.9rem;
+font-size:0.8rem;
+margin-bottom:10px;
 color:var(--blue);
-margin-bottom:0.5rem;
 }
 
 .value{
 font-family:'Orbitron';
-font-size:2.8rem;
+font-size:2.2rem;
 color:var(--accent);
-}
-
-.chart{
-height:300px;
 }
 
 canvas{
 width:100%!important;
-height:100%!important;
+height:250px!important;
 }
 
-/* ===== ALERT ===== */
-.alert{
-margin-top:1rem;
-font-family:'Orbitron';
-font-size:0.9rem;
-}
-
-.warning{color:var(--accent);}
+.alert{margin-top:8px;font-family:'Orbitron';}
+.warning{color:orange;}
 .critical{color:var(--red);}
-
 </style>
 </head>
+
 <body>
 
-<!-- LANDING -->
-<section class="landing" id="landing">
-<h1 class="title">TEAM SAKTHI RACING</h1>
-<p class="subtitle">FORMULA STUDENT TELEMETRY CONTROL SYSTEM</p>
-<button class="enter-btn" onclick="startSystem()">ENTER PITWALL</button>
-</section>
-
-<!-- PITWALL BAR -->
-<div class="pitwall" id="pitwall" style="display:none;">
-<div>TSR PITWALL</div>
-<div id="speed">SPD: 0 km/h</div>
-<div id="rpm">RPM: 0</div>
-<div id="gforce">G: 0.0</div>
-<div class="live">● LIVE</div>
+<div class="sidebar">
+<h2>TSR</h2>
+<button class="nav-btn" onclick="showSection('powertrain')">POWERTRAIN</button>
+<button class="nav-btn" onclick="showSection('electrical')">ELECTRICAL</button>
+<button class="nav-btn" onclick="showSection('suspension')">SUSPENSION</button>
+<button class="nav-btn" onclick="showSection('brakes')">BRAKES</button>
+<button class="nav-btn" onclick="showSection('imu')">IMU</button>
 </div>
 
-<!-- DASHBOARD -->
-<section class="dashboard" id="dashboard">
+<div class="main">
 
-<h2 class="section-title">POWERTRAIN TELEMETRY</h2>
-
+<!-- POWERTRAIN -->
+<div id="powertrain" class="section active">
+<h2>POWERTRAIN</h2>
 <div class="grid">
-
 <div class="card">
 <h3>LAMBDA</h3>
 <div class="value" id="lambda">0.95</div>
 <div class="alert" id="lambdaAlert"></div>
 </div>
-
 <div class="card">
-<h3>ENGINE TEMP (°C)</h3>
+<h3>ENGINE TEMP</h3>
 <div class="value" id="temp">85</div>
 <div class="alert" id="tempAlert"></div>
 </div>
-
-<div class="card chart">
+<div class="card">
+<h3>RPM</h3>
+<div class="value" id="rpm">4500</div>
+</div>
+<div class="card">
 <h3>LAMBDA TREND</h3>
 <canvas id="lambdaChart"></canvas>
 </div>
+</div>
+</div>
 
-<div class="card chart">
-<h3>TEMP TREND</h3>
-<canvas id="tempChart"></canvas>
+<!-- ELECTRICAL -->
+<div id="electrical" class="section">
+<h2>ELECTRICAL</h2>
+<div class="grid">
+<div class="card">
+<h3>BATTERY VOLTAGE</h3>
+<div class="value" id="voltage">12.5</div>
+<div class="alert" id="voltAlert"></div>
+</div>
+<div class="card">
+<h3>CURRENT DRAW (A)</h3>
+<div class="value" id="current">15</div>
+</div>
+</div>
+</div>
+
+<!-- SUSPENSION -->
+<div id="suspension" class="section">
+<h2>SUSPENSION LOAD (kg)</h2>
+<div class="grid">
+<div class="card"><h3>FRONT LEFT</h3><div class="value" id="fl">120</div></div>
+<div class="card"><h3>FRONT RIGHT</h3><div class="value" id="fr">118</div></div>
+<div class="card"><h3>REAR LEFT</h3><div class="value" id="rl">140</div></div>
+<div class="card"><h3>REAR RIGHT</h3><div class="value" id="rr">138</div></div>
+</div>
+</div>
+
+<!-- BRAKES -->
+<div id="brakes" class="section">
+<h2>BRAKE TEMP (°C)</h2>
+<div class="grid">
+<div class="card"><h3>FRONT</h3><div class="value" id="bf">320</div></div>
+<div class="card"><h3>REAR</h3><div class="value" id="br">290</div></div>
+</div>
+</div>
+
+<!-- IMU -->
+<div id="imu" class="section">
+<h2>VEHICLE DYNAMICS</h2>
+<div class="grid">
+<div class="card"><h3>LATERAL G</h3><div class="value" id="latg">1.2</div></div>
+<div class="card"><h3>LONGITUDINAL G</h3><div class="value" id="longg">0.8</div></div>
+<div class="card"><h3>YAW RATE</h3><div class="value" id="yaw">32</div></div>
+</div>
 </div>
 
 </div>
-
-</section>
 
 <script>
 
-let lambdaChart,tempChart;
-let time=[],lambdaData=[],tempData=[];
+let lambdaChart;
+let labels=[],lambdaData=[];
 
-function startSystem(){
-document.getElementById("landing").style.display="none";
-document.getElementById("dashboard").style.display="block";
-document.getElementById("pitwall").style.display="flex";
-initCharts();
-runTelemetry();
+function showSection(id){
+document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+document.getElementById(id).classList.add('active');
 }
-
-function initCharts(){
 
 lambdaChart=new Chart(document.getElementById("lambdaChart"),{
 type:"line",
-data:{labels:[],datasets:[{
-label:"Lambda",
-data:[],
-borderColor:"#00c2ff",
-tension:0.3
-}]},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{legend:{labels:{color:"white"}}},
-scales:{
-x:{ticks:{color:"white"}},
-y:{min:0.7,max:1.3,ticks:{color:"white"}}
-}
-}
+data:{labels:[],datasets:[{data:[],borderColor:"#00c2ff",tension:0.3}]},
+options:{responsive:true,maintainAspectRatio:false}
 });
-
-tempChart=new Chart(document.getElementById("tempChart"),{
-type:"line",
-data:{labels:[],datasets:[{
-label:"Temp",
-data:[],
-borderColor:"#ff5c00",
-tension:0.3
-}]},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{legend:{labels:{color:"white"}}},
-scales:{
-x:{ticks:{color:"white"}},
-y:{min:60,max:120,ticks:{color:"white"}}
-}
-}
-});
-
-}
-
-function runTelemetry(){
 
 setInterval(()=>{
 
-let now=new Date().toLocaleTimeString();
 let lambda=0.9+Math.random()*0.25;
 let temp=80+Math.random()*30;
-let rpm=3000+Math.random()*5000;
-let speed=50+Math.random()*100;
-let g=(Math.random()*2).toFixed(2);
+let rpm=3000+Math.random()*4000;
+let voltage=11+Math.random()*2;
+let current=10+Math.random()*10;
 
 document.getElementById("lambda").innerText=lambda.toFixed(2);
 document.getElementById("temp").innerText=Math.round(temp);
-document.getElementById("rpm").innerText="RPM: "+Math.round(rpm);
-document.getElementById("speed").innerText="SPD: "+Math.round(speed)+" km/h";
-document.getElementById("gforce").innerText="G: "+g;
+document.getElementById("rpm").innerText=Math.round(rpm);
+document.getElementById("voltage").innerText=voltage.toFixed(2);
+document.getElementById("current").innerText=Math.round(current);
 
-/* WARNINGS */
-let lambdaAlert=document.getElementById("lambdaAlert");
+document.getElementById("fl").innerText=Math.round(110+Math.random()*20);
+document.getElementById("fr").innerText=Math.round(110+Math.random()*20);
+document.getElementById("rl").innerText=Math.round(130+Math.random()*20);
+document.getElementById("rr").innerText=Math.round(130+Math.random()*20);
+
+document.getElementById("bf").innerText=Math.round(300+Math.random()*50);
+document.getElementById("br").innerText=Math.round(270+Math.random()*50);
+
+document.getElementById("latg").innerText=(Math.random()*2).toFixed(2);
+document.getElementById("longg").innerText=(Math.random()*2).toFixed(2);
+document.getElementById("yaw").innerText=Math.round(Math.random()*50);
+
+/* Alerts */
 if(lambda>1.1){
-lambdaAlert.innerText="LEAN MIXTURE WARNING";
-lambdaAlert.className="alert warning";
+document.getElementById("lambdaAlert").innerText="LEAN WARNING";
+document.getElementById("lambdaAlert").className="alert warning";
 }else{
-lambdaAlert.innerText="";
+document.getElementById("lambdaAlert").innerText="";
 }
 
-let tempAlert=document.getElementById("tempAlert");
 if(temp>105){
-tempAlert.innerText="ENGINE OVERHEAT";
-tempAlert.className="alert critical";
+document.getElementById("tempAlert").innerText="OVERHEAT";
+document.getElementById("tempAlert").className="alert critical";
 }else{
-tempAlert.innerText="";
+document.getElementById("tempAlert").innerText="";
 }
 
-time.push(now);
+if(voltage<11.5){
+document.getElementById("voltAlert").innerText="LOW VOLTAGE";
+document.getElementById("voltAlert").className="alert warning";
+}else{
+document.getElementById("voltAlert").innerText="";
+}
+
+/* Chart */
+let time=new Date().toLocaleTimeString();
+labels.push(time);
 lambdaData.push(lambda);
-tempData.push(temp);
-
-if(time.length>20){
-time.shift();lambdaData.shift();tempData.shift();
-}
-
-lambdaChart.data.labels=time;
+if(labels.length>20){labels.shift();lambdaData.shift();}
+lambdaChart.data.labels=labels;
 lambdaChart.data.datasets[0].data=lambdaData;
 lambdaChart.update();
 
-tempChart.data.labels=time;
-tempChart.data.datasets[0].data=tempData;
-tempChart.update();
-
 },2000);
-
-}
 
 </script>
 
