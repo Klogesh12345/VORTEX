@@ -1,109 +1,541 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>VORTEX Telemetry</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEAM SAKTHI RACING - Vortex Pitwall Telemetry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@400;600;800&family=Digital-7&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --primary-bg: #0f0f0f;
+            --accent-orange: #ff6a00;
+            --accent-blue: #00c3ff;
+            --text-white: #ffffff;
+            --warning-red: #ff2d2d;
+            --safe-green: #00ff88;
+            --glass-bg: rgba(255,255,255,0.1);
+            --glass-border: rgba(255,255,255,0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-white);
+            overflow-x: hidden;
+        }
+
+        /* Landing Page */
+        .landing {
+            height: 100vh;
+            width: 100vw;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                        url('145.jpg') center/cover fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .landing::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle, rgba(255,106,0,0.1) 0%, transparent 70%);
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .team-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 900;
+            text-shadow: 0 0 20px var(--accent-orange);
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 10px var(--accent-orange)); }
+            to { filter: drop-shadow(0 0 30px var(--accent-orange)); }
+        }
+
+        .subtitle {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .enter-btn {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 1.2rem 3rem;
+            background: linear-gradient(45deg, var(--accent-orange), var(--accent-blue));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255,106,0,0.4);
+        }
+
+        .enter-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(255,106,0,0.6);
+        }
+
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .enter-btn:hover::before { left: 100%; }
+
+        .subsystems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 4rem;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .subsystem-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subsystem-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, var(--accent-orange) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .subsystem-card:hover::before { opacity: 0.1; }
+        .subsystem-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .subsystem-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .subsystem-name {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Dashboard Pages */
+        .dashboard {
+            min-height: 100vh;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-bg) 0%, #1a1a2e 50%, #16213e 100%);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--accent-orange), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .status-green { background: rgba(0,255,136,0.2); color: var(--safe-green); border: 1px solid var(--safe-green); }
+        .status-red { background: rgba(255,45,45,0.2); color: var(--warning-red); border: 1px solid var(--warning-red); }
+
+        .back-btn {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover { background: var(--accent-blue); }
+
+        /* Telemetry Cards */
+        .telemetry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .telemetry-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .telemetry-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-blue));
+        }
+
+        .sensor-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+
+        .sensor-value {
+            font-family: 'Digital-7', monospace;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .sensor-unit { font-size: 1rem; opacity: 0.8; }
+
+        /* Gauges */
+        .gauge-container {
+            height: 200px;
+            position: relative;
+        }
+
+        .gauge-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 8px solid transparent;
+            border-top: 8px solid var(--accent-orange);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+
+        /* Charts */
+        .chart-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            height: 400px;
+        }
+
+        /* Inference Panel */
+        .inference-panel {
+            background: linear-gradient(135deg, rgba(255,106,0,0.1), rgba(0,195,255,0.1));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+
+        .inference-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--glass-bg);
+            border-radius: 12px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-green-dot { background: var(--safe-green); box-shadow: 0 0 10px var(--safe-green); }
+        .status-red-dot { background: var(--warning-red); box-shadow: 0 0 10px var(--warning-red); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard { padding: 1rem; }
+            .dashboard-title { font-size: 2rem; }
+            .subsystems-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Hide pages initially */
+        [data-page]:not([data-page="landing"]) { display: none; }
+    </style>
 </head>
-<body class="dashboard-body">
+<body>
+    <!-- Landing Page -->
+    <div id="landing" data-page="landing" class="landing">
+        <h1 class="team-title">TEAM SAKTHI RACING</h1>
+        <p class="subtitle">Formula Student India 2026 | Vortex Pitwall Telemetry</p>
+        <button class="enter-btn" onclick="showDashboard()">ENTER DASHBOARD</button>
+        
+        <div class="subsystems-grid">
+            <div class="subsystem-card" onclick="showDashboard('powertrain')">
+                <span class="subsystem-icon">⚙️</span>
+                <div class="subsystem-name">POWERTRAIN</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('suspension')">
+                <span class="subsystem-icon">🔧</span>
+                <div class="subsystem-name">SUSPENSION</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('brakes')">
+                <span class="subsystem-icon">🛑</span>
+                <div class="subsystem-name">BRAKES</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('chassis')">
+                <span class="subsystem-icon">🚗</span>
+                <div class="subsystem-name">CHASSIS</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('electrical')">
+                <span class="subsystem-icon">⚡</span>
+                <div class="subsystem-name">ELECTRICAL</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('embedded')">
+                <span class="subsystem-icon">💾</span>
+                <div class="subsystem-name">EMBEDDED</div>
+            </div>
+        </div>
+    </div>
 
-<h1 class="dashboard-title">VORTEX LIVE TELEMETRY</h1>
+    <!-- Powertrain Dashboard -->
+    <div id="powertrain" data-page="powertrain" class="dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">POWERTRAIN TELEMETRY</h1>
+            <div class="status-indicator status-green">
+                <div class="status-dot status-green-dot"></div>
+                LIVE
+            </div>
+            <button class="back-btn" onclick="showLanding()">← BACK TO DASHBOARD</button>
+        </div>
 
-<div class="grid">
+        <div class="telemetry-grid" id="powertrain-sensors">
+            <!-- Live sensor values populated by JS -->
+        </div>
 
-<!-- POWERTRAIN -->
-<div class="card">
-<h2>Powertrain</h2>
-<canvas id="rpm"></canvas>
-<canvas id="throttle"></canvas>
-<canvas id="map"></canvas>
-<canvas id="coolant"></canvas>
-</div>
+        <div class="chart-container">
+            <canvas id="powertrainChart"></canvas>
+        </div>
 
-<!-- ELECTRICAL -->
-<div class="card">
-<h2>Electrical</h2>
-<canvas id="battery"></canvas>
-<canvas id="fuse"></canvas>
-</div>
+        <div class="inference-panel">
+            <h3 style="margin-bottom: 1.5rem; color: var(--accent-orange);">ENGINEERING INSIGHTS</h3>
+            <div id="powertrain-inference"></div>
+        </div>
+    </div>
 
-<!-- SUSPENSION -->
-<div class="card">
-<h2>Suspension</h2>
-<canvas id="suspension"></canvas>
-</div>
+    <!-- Other dashboards follow similar structure -->
+    <div id="suspension" data-page="suspension" class="dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">SUSPENSION TELEMETRY</h1>
+            <div class="status-indicator status-green">
+                <div class="status-dot status-green-dot"></div>
+                LIVE
+            </div>
+            <button class="back-btn" onclick="showLanding()">← BACK TO DASHBOARD</button>
+        </div>
+        <div class="telemetry-grid" id="suspension-sensors"></div>
+        <div class="chart-container">
+            <canvas id="suspensionChart"></canvas>
+        </div>
+        <div class="inference-panel">
+            <h3 style="margin-bottom: 1.5rem; color: var(--accent-orange);">SUSPENSION ANALYSIS</h3>
+            <div id="suspension-inference"></div>
+        </div>
+    </div>
 
-<!-- BRAKES -->
-<div class="card">
-<h2>Brakes</h2>
-<canvas id="brake"></canvas>
-</div>
+    <!-- Add similar structure for brakes, chassis, electrical, embedded -->
 
-</div>
+    <script>
+        // Global telemetry data simulation
+        const telemetryData = {
+            powertrain: {
+                sensors: {
+                    lambda: { value: 0.95, unit: 'AFR', min: 0.7, max: 1.3 },
+                    tps: { value: 45, unit: '%', min: 0, max: 100 },
+                    ect: { value: 85, unit: '°C', min: 60, max: 105 },
+                    radiator: { value: 78, unit: '°C', min: 50, max: 95 }
+                },
+                history: { lambda: [], tps: [], ect: [], radiator: [], time: [] }
+            }
+        };
 
-<script>
+        // Real-time simulation
+        function simulateData() {
+            // Update powertrain data
+            telemetryData.powertrain.sensors.lambda.value = 0.85 + Math.sin(Date.now() * 0.001) * 0.2;
+            telemetryData.powertrain.sensors.tps.value = 25 + Math.sin(Date.now() * 0.0008) * 75;
+            telemetryData.powertrain.sensors.ect.value = 75 + Math.sin(Date.now() * 0.0005) * 15;
+            telemetryData.powertrain.sensors.radiator.value = 70 + Math.sin(Date.now() * 0.0006) * 12;
 
-function createChart(id,label,max){
-return new Chart(document.getElementById(id),{
-type:'line',
-data:{
-labels:[],
-datasets:[{
-label:label,
-data:[],
-borderColor:'#c77dff',
-backgroundColor:'rgba(199,125,255,0.1)',
-tension:0.4,
-fill:true
-}]
-},
-options:{
-responsive:true,
-plugins:{
-legend:{labels:{color:'white'}}
-},
-scales:{
-x:{ticks:{color:'white'}},
-y:{min:0,max:max,ticks:{color:'white'}}
-}
-}
-});
-}
+            // Add to history
+            const now = new Date().toLocaleTimeString();
+            telemetryData.powertrain.history.time.push(now);
+            telemetryData.powertrain.history.lambda.push(telemetryData.powertrain.sensors.lambda.value);
+            telemetryData.powertrain.history.tps.push(telemetryData.powertrain.sensors.tps.value);
+            telemetryData.powertrain.history.ect.push(telemetryData.powertrain.sensors.ect.value);
+            telemetryData.powertrain.history.radiator.push(telemetryData.powertrain.sensors.radiator.value);
 
-let rpmChart=createChart("rpm","RPM",12000);
-let throttleChart=createChart("throttle","Throttle %",100);
-let mapChart=createChart("map","Manifold Pressure (kPa)",200);
-let coolantChart=createChart("coolant","Coolant Temp °C",120);
-let batteryChart=createChart("battery","Battery Voltage",15);
-let fuseChart=createChart("fuse","Fuse Output (A)",30);
-let suspensionChart=createChart("suspension","Suspension Travel (mm)",100);
-let brakeChart=createChart("brake","Brake Pressure (bar)",10);
+            // Keep only last 50 points
+            Object.values(telemetryData.powertrain.history).forEach(arr => {
+                if (arr.length > 50) arr.shift();
+            });
+        }
 
-function update(chart,value){
-let time=new Date().toLocaleTimeString();
+        // Page navigation
+        function showLanding() {
+            document.querySelectorAll('[data-page]').forEach(page => page.style.display = 'none');
+            document.getElementById('landing').style.display = 'flex';
+        }
 
-if(chart.data.labels.length>20){
-chart.data.labels.shift();
-chart.data.datasets[0].data.shift();
-}
+        function showDashboard(subsystem = null) {
+            document.querySelectorAll('[data-page]').forEach(page => page.style.display = 'none');
+            if (subsystem) {
+                document.getElementById(subsystem).style.display = 'block';
+                initDashboard(subsystem);
+            } else {
+                document.getElementById('landing').style.display = 'flex';
+            }
+        }
 
-chart.data.labels.push(time);
-chart.data.datasets[0].data.push(value);
-chart.update();
-}
+        // Initialize dashboard
+        function initDashboard(subsystem) {
+            if (subsystem === 'powertrain') initPowertrain();
+        }
 
-setInterval(()=>{
-update(rpmChart,7000+Math.random()*4000);
-update(throttleChart,Math.random()*100);
-update(mapChart,80+Math.random()*40);
-update(coolantChart,80+Math.random()*20);
-update(batteryChart,12+Math.random()*2);
-update(fuseChart,Math.random()*20);
-update(suspensionChart,Math.random()*80);
-update(brakeChart,Math.random()*8);
-},1000);
+        function initPowertrain() {
+            // Update sensor cards
+            const sensors = telemetryData.powertrain.sensors;
+            const grid = document.getElementById('powertrain-sensors');
+            grid.innerHTML = `
+                ${Object.entries(sensors).map(([key, sensor]) => `
+                    <div class="telemetry-card">
+                        <div class="sensor-name">${key.toUpperCase()}</div>
+                        <div class="sensor-value">${sensor.value.toFixed(1)}</div>
+                        <div class="sensor-unit">${sensor.unit}</div>
+                    </div>
+                `).join('')}
+            `;
 
-</script>
+            // Update chart
+            const ctx = document.getElementById('powertrainChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: telemetryData.powertrain.history.time.slice(-20),
+                    datasets: [
+                        {
+                            label: 'Lambda (AFR)',
+                            data: telemetryData.powertrain.history.lambda.slice(-20),
+                            borderColor: '#00c3ff',
+                            backgroundColor: 'rgba(0,195,255,0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'ECT (°C)',
+                            data: telemetryData.powertrain.history.ect.slice(-20),
+                            borderColor: '#ff6a00',
+                            backgroundColor: 'rgba(255,106,0,0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: false }
+                    }
+                }
+            });
 
+            // Update inference
+            updatePowertrainInference();
+        }
+
+        function updatePowertrainInference() {
+            const sensors = telemetryData.powertrain.sensors;
+            const inference = document.getElementById('powertrain-inference');
+            
+            const lean = sensors.lambda.value > 1.1;
+            const hot = sensors.ect.value > 100;
+            
+            inference.innerHTML = `
+                <div class="inference-item">
+                    <div class="status-dot ${lean ? 'status-red-dot' : 'status-green-dot'}"></div>
+                    <span>${lean ? '⚠️ LEAN CONDITION' : '✅ Optimal Mixture'}</span>
+                </div>
+                <div class="inference-item">
+                    <div class="status-dot ${hot ? 'status-red-dot' : 'status-green-dot'}"></div>
+                    <span>${hot ? '🔥 OVERHEATING RISK' : '✅ Thermal Safe'}</span>
+                </div>
+            `;
+        }
+
+        // Main simulation loop
+        setInterval(() => {
+            simulateData();
+            // Update active dashboard
+            const activePage = document.querySelector('[data-page]:not([style*="display: none"])');
+            if (activePage && activePage.id !== 'landing') {
+                initDashboard(activePage.id);
+            }
+        }, 1000);
+
+        // Initialize
+        showLanding();
+    </script>
 </body>
 </html>
