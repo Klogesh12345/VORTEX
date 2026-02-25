@@ -3,35 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TEAM SAKTHI RACING | TELEMETRY</title>
+<title>TEAM SAKTHI RACING | PITWALL</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
-/* ===== THEME ===== */
+/* ===== CORE THEME ===== */
 :root{
---bg-black:#0c0c0f;
---bg-dark:#15151c;
---accent:#ff6a00;
---accent2:#00b3ff;
---text:#ffffff;
---glass:rgba(255,255,255,0.06);
---border:rgba(255,255,255,0.15);
+--black:#0b0b0f;
+--dark:#14141a;
+--accent:#ff5c00;
+--blue:#00c2ff;
+--green:#00ff88;
+--red:#ff2e2e;
+--white:#ffffff;
 }
 
-/* ===== GLOBAL ===== */
 *{margin:0;padding:0;box-sizing:border-box;}
 
 body{
 font-family:'Rajdhani',sans-serif;
-background:var(--bg-black);
-color:var(--text);
+background:var(--black);
+color:var(--white);
 overflow-x:hidden;
 }
 
-/* ===== LANDING ===== */
+/* ===== LANDING PAGE ===== */
 .landing{
 min-height:100vh;
 display:flex;
@@ -46,10 +45,10 @@ padding:2rem;
 }
 
 .title{
-font-family:'Orbitron',sans-serif;
-font-size:3.8rem;
+font-family:'Orbitron';
+font-size:4rem;
 font-weight:900;
-letter-spacing:2px;
+letter-spacing:3px;
 margin-bottom:1rem;
 }
 
@@ -59,8 +58,8 @@ opacity:0.8;
 margin-bottom:2rem;
 }
 
-.enter{
-padding:1rem 2.5rem;
+.enter-btn{
+padding:1rem 3rem;
 border:2px solid var(--accent);
 background:transparent;
 color:white;
@@ -69,63 +68,72 @@ cursor:pointer;
 transition:0.3s;
 }
 
-.enter:hover{
+.enter-btn:hover{
 background:var(--accent);
+}
+
+/* ===== PITWALL BAR ===== */
+.pitwall{
+position:fixed;
+top:0;
+width:100%;
+background:#000;
+display:flex;
+justify-content:space-between;
+padding:10px 20px;
+font-family:'Orbitron';
+font-size:0.9rem;
+border-bottom:2px solid var(--accent);
+z-index:1000;
+}
+
+.live{
+color:var(--green);
+animation:blink 1s infinite alternate;
+}
+
+@keyframes blink{
+from{opacity:0.5;}
+to{opacity:1;}
 }
 
 /* ===== DASHBOARD ===== */
 .dashboard{
 display:none;
+padding:80px 2rem 2rem 2rem;
 min-height:100vh;
-padding:2rem;
-background:linear-gradient(135deg,#14141a,#0c0c0f);
+background:linear-gradient(135deg,#15151a,#0b0b0f);
 }
 
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:2rem;
-flex-wrap:wrap;
-}
-
-.header h1{
+.section-title{
 font-family:'Orbitron';
-font-size:2rem;
-}
-
-.back{
-padding:0.6rem 1.2rem;
-border:1px solid var(--border);
-background:transparent;
-color:white;
-cursor:pointer;
+font-size:1.8rem;
+margin-bottom:2rem;
 }
 
 /* ===== GRID ===== */
 .grid{
 display:grid;
-grid-template-columns:1fr 1fr;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:2rem;
 }
 
 .card{
-background:var(--glass);
-border:1px solid var(--border);
+background:#111;
+border:1px solid #222;
 padding:1.5rem;
 }
 
 .card h3{
 font-family:'Orbitron';
-margin-bottom:1rem;
-font-size:1rem;
-letter-spacing:1px;
-color:var(--accent2);
+font-size:0.9rem;
+color:var(--blue);
+margin-bottom:0.5rem;
 }
 
 .value{
 font-family:'Orbitron';
-font-size:2.5rem;
+font-size:2.8rem;
 color:var(--accent);
 }
 
@@ -134,14 +142,19 @@ height:300px;
 }
 
 canvas{
-width:100% !important;
-height:100% !important;
+width:100%!important;
+height:100%!important;
 }
 
-@media(max-width:900px){
-.grid{grid-template-columns:1fr;}
-.title{font-size:2.5rem;}
+/* ===== ALERT ===== */
+.alert{
+margin-top:1rem;
+font-family:'Orbitron';
+font-size:0.9rem;
 }
+
+.warning{color:var(--accent);}
+.critical{color:var(--red);}
 
 </style>
 </head>
@@ -150,27 +163,36 @@ height:100% !important;
 <!-- LANDING -->
 <section class="landing" id="landing">
 <h1 class="title">TEAM SAKTHI RACING</h1>
-<p class="subtitle">Formula Student Telemetry Control System</p>
-<button class="enter" onclick="openDashboard()">ENTER TELEMETRY</button>
+<p class="subtitle">FORMULA STUDENT TELEMETRY CONTROL SYSTEM</p>
+<button class="enter-btn" onclick="startSystem()">ENTER PITWALL</button>
 </section>
+
+<!-- PITWALL BAR -->
+<div class="pitwall" id="pitwall" style="display:none;">
+<div>TSR PITWALL</div>
+<div id="speed">SPD: 0 km/h</div>
+<div id="rpm">RPM: 0</div>
+<div id="gforce">G: 0.0</div>
+<div class="live">● LIVE</div>
+</div>
 
 <!-- DASHBOARD -->
 <section class="dashboard" id="dashboard">
-<div class="header">
-<h1>POWERTRAIN TELEMETRY</h1>
-<button class="back" onclick="goBack()">BACK</button>
-</div>
+
+<h2 class="section-title">POWERTRAIN TELEMETRY</h2>
 
 <div class="grid">
 
 <div class="card">
-<h3>LAMBDA SENSOR</h3>
+<h3>LAMBDA</h3>
 <div class="value" id="lambda">0.95</div>
+<div class="alert" id="lambdaAlert"></div>
 </div>
 
 <div class="card">
-<h3>THROTTLE POSITION</h3>
-<div class="value" id="tps">40%</div>
+<h3>ENGINE TEMP (°C)</h3>
+<div class="value" id="temp">85</div>
+<div class="alert" id="tempAlert"></div>
 </div>
 
 <div class="card chart">
@@ -179,11 +201,12 @@ height:100% !important;
 </div>
 
 <div class="card chart">
-<h3>TEMPERATURE TREND</h3>
+<h3>TEMP TREND</h3>
 <canvas id="tempChart"></canvas>
 </div>
 
 </div>
+
 </section>
 
 <script>
@@ -191,82 +214,95 @@ height:100% !important;
 let lambdaChart,tempChart;
 let time=[],lambdaData=[],tempData=[];
 
-function openDashboard(){
+function startSystem(){
 document.getElementById("landing").style.display="none";
 document.getElementById("dashboard").style.display="block";
+document.getElementById("pitwall").style.display="flex";
 initCharts();
-startData();
-}
-
-function goBack(){
-document.getElementById("dashboard").style.display="none";
-document.getElementById("landing").style.display="flex";
+runTelemetry();
 }
 
 function initCharts(){
 
 lambdaChart=new Chart(document.getElementById("lambdaChart"),{
 type:"line",
-data:{
-labels:[],
-datasets:[{
+data:{labels:[],datasets:[{
 label:"Lambda",
 data:[],
-borderColor:"#00b3ff",
+borderColor:"#00c2ff",
 tension:0.3
-}]
-},
+}]},
 options:{
 responsive:true,
 maintainAspectRatio:false,
 plugins:{legend:{labels:{color:"white"}}},
 scales:{
 x:{ticks:{color:"white"}},
-y:{ticks:{color:"white"},min:0.7,max:1.3}
+y:{min:0.7,max:1.3,ticks:{color:"white"}}
 }
 }
 });
 
 tempChart=new Chart(document.getElementById("tempChart"),{
 type:"line",
-data:{
-labels:[],
-datasets:[{
-label:"Engine Temp",
+data:{labels:[],datasets:[{
+label:"Temp",
 data:[],
-borderColor:"#ff6a00",
+borderColor:"#ff5c00",
 tension:0.3
-}]
-},
+}]},
 options:{
 responsive:true,
 maintainAspectRatio:false,
 plugins:{legend:{labels:{color:"white"}}},
 scales:{
 x:{ticks:{color:"white"}},
-y:{ticks:{color:"white"},min:60,max:120}
+y:{min:60,max:120,ticks:{color:"white"}}
 }
 }
 });
 
 }
 
-function startData(){
-setInterval(()=>{
-let now=new Date().toLocaleTimeString();
+function runTelemetry(){
 
-let lambda=0.9+Math.random()*0.2;
-let tps=Math.floor(Math.random()*100);
-let temp=80+Math.random()*20;
+setInterval(()=>{
+
+let now=new Date().toLocaleTimeString();
+let lambda=0.9+Math.random()*0.25;
+let temp=80+Math.random()*30;
+let rpm=3000+Math.random()*5000;
+let speed=50+Math.random()*100;
+let g=(Math.random()*2).toFixed(2);
 
 document.getElementById("lambda").innerText=lambda.toFixed(2);
-document.getElementById("tps").innerText=tps+"%";
+document.getElementById("temp").innerText=Math.round(temp);
+document.getElementById("rpm").innerText="RPM: "+Math.round(rpm);
+document.getElementById("speed").innerText="SPD: "+Math.round(speed)+" km/h";
+document.getElementById("gforce").innerText="G: "+g;
+
+/* WARNINGS */
+let lambdaAlert=document.getElementById("lambdaAlert");
+if(lambda>1.1){
+lambdaAlert.innerText="LEAN MIXTURE WARNING";
+lambdaAlert.className="alert warning";
+}else{
+lambdaAlert.innerText="";
+}
+
+let tempAlert=document.getElementById("tempAlert");
+if(temp>105){
+tempAlert.innerText="ENGINE OVERHEAT";
+tempAlert.className="alert critical";
+}else{
+tempAlert.innerText="";
+}
 
 time.push(now);
 lambdaData.push(lambda);
 tempData.push(temp);
 
-if(time.length>15){
+if(time.length>20){
 time.shift();lambdaData.shift();tempData.shift();
 }
 
@@ -279,6 +315,7 @@ tempChart.data.datasets[0].data=tempData;
 tempChart.update();
 
 },2000);
+
 }
 
 </script>
