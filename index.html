@@ -1,221 +1,647 @@
-
-     <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAKTHI RACING | VORTEX PITWALL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>SAKTHI RACING | VORTEX PITWALL - Formula Student Telemetry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Exo+2:wght@400;600;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
     <style>
+        :root {
+            /* WORLD-CLASS F1-INSPIRED COLOR SYSTEM */
+            --f1-black: #0a0a0a;
+            --f1-charcoal: #1a1a2e;
+            --f1-steel: #2d3748;
+            --f1-mercedes-silver: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 50%, #d4d4d4 100%);
+            --f1-redbull-blue: linear-gradient(135deg, #005eff 0%, #1e40af 50%, #1d4ed8 100%);
+            --f1-ferrari-red: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #ef4444 100%);
+            --f1-mclaren-orange: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #fb923c 100%);
+            --f1-alpine-teal: linear-gradient(135deg, #0ea5e9 0%, #0284c7 50%, #0ea5e9 100%);
+            --neon-glow-cyan: #00f5ff;
+            --neon-glow-magenta: #ff00ff;
+            --glass-primary: rgba(255,255,255,0.06);
+            --glass-secondary: rgba(255,255,255,0.1);
+            --glass-border: rgba(255,255,255,0.15);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.85);
+            --text-muted: rgba(255,255,255,0.6);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-            font-family: 'Rajdhani', sans-serif;
-            background: #0a0a0a;
-            color: white;
+            font-family: 'Rajdhani', 'Exo 2', sans-serif;
+            background: var(--f1-black);
+            color: var(--text-primary);
             overflow-x: hidden;
         }
 
-        /* FALLBACK + WORKING BACKGROUND */
+        /* LOADING SCREEN - F1 Style */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--f1-black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(50px);
+        }
+
+        .loading-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            background: var(--f1-mercedes-silver);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(192,192,192,0.6);
+            margin-bottom: 3rem;
+            animation: flicker 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes flicker {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .loading-bar {
+            width: 400px;
+            max-width: 90vw;
+            height: 6px;
+            background: var(--glass-primary);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.3);
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: var(--f1-redbull-blue);
+            width: 0%;
+            border-radius: 3px;
+            animation: loadProgress 3.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            box-shadow: 0 0 20px var(--neon-glow-cyan);
+        }
+
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* LANDING PAGE - CINEMATIC */
         .landing {
-            height: 100vh;
+            min-height: 100vh;
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            position: relative;
+            overflow: hidden;
+        }
+
+        .landing::before {
+            content: '';
+            position: absolute;
+            inset: 0;
             background: 
-                /* TRY 3 METHODS - ONE WILL WORK */
-                linear-gradient(135deg, rgba(15,15,20,0.9), rgba(0,0,0,0.8)),
-                /* METHOD 1: Your GitHub raw URL - REPLACE YOUR_USERNAME */
-                url('https://raw.githubusercontent.com/YOUR_USERNAME/vortex-pitwall/main/145.jpeg') center/cover no-repeat fixed,
-                /* METHOD 2: Relative path */
-                url('./145.jpeg') center/cover no-repeat fixed,
-                /* METHOD 3: Fallback gradient */
-                linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+                linear-gradient(135deg, rgba(10,10,10,0.85) 0%, rgba(26,26,46,0.7) 50%, rgba(10,10,10,0.9) 100%),
+                url('145.jpeg') center/cover no-repeat fixed;
+            z-index: -1;
+            filter: brightness(0.65) contrast(1.15) saturate(1.1);
+        }
+
+        /* DYNAMIC GRID BACKGROUND */
+        .landing::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 245, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 25% 75%, rgba(255, 107, 53, 0.05) 0%, transparent 50%);
+            animation: gridFloat 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes gridFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 40px) rotate(240deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1000px;
+            padding: 0 2rem;
         }
 
         .team-title {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(4rem, 12vw, 8rem);
+            font-size: clamp(4.5rem, 12vw, 9rem);
             font-weight: 900;
-            background: linear-gradient(45deg, #ff6b35, #00d4ff);
+            background: var(--f1-mercedes-silver);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255,107,53,0.5);
-            margin-bottom: 1rem;
-            animation: glow 2s ease-in-out infinite alternate;
+            background-clip: text;
+            line-height: 0.9;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 60px rgba(192,192,192,0.4));
+            animation: titlePulse 4s ease-in-out infinite;
         }
 
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 20px rgba(255,107,53,0.5)); }
-            to { filter: drop-shadow(0 0 40px rgba(255,107,53,0.8)); }
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 40px rgba(192,192,192,0.4)); }
+            50% { transform: scale(1.02); filter: drop-shadow(0 0 70px rgba(192,192,192,0.6)); }
+        }
+
+        .team-subtitle {
+            font-size: clamp(1.3rem, 3.5vw, 2rem);
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 4rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
         .enter-btn {
             font-family: 'Orbitron', monospace;
-            font-size: 1.4rem;
-            font-weight: 700;
-            padding: 1.5rem 3rem;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255,107,53,0.5);
-            border-radius: 50px;
-            color: white;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            font-weight: 800;
+            padding: 1.8rem 4.5rem;
+            background: linear-gradient(45deg, var(--glass-secondary), var(--glass-primary));
+            backdrop-filter: blur(30px);
+            border: 2px solid transparent;
+            border-radius: 60px;
+            color: var(--text-primary);
             cursor: pointer;
-            margin: 2rem 0;
-            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.2);
+        }
+
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--f1-redbull-blue);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            z-index: -1;
         }
 
         .enter-btn:hover {
-            background: rgba(255,107,53,0.2);
-            box-shadow: 0 0 30px rgba(255,107,53,0.5);
-            transform: scale(1.05);
+            transform: translateY(-12px) scale(1.05);
+            border-color: var(--neon-glow-cyan);
+            box-shadow: 
+                0 35px 70px rgba(0,245,255,0.3),
+                0 0 60px rgba(0,245,255,0.2);
         }
 
-        .subsystems {
+        .enter-btn:hover::before { transform: scaleX(1); }
+
+        /* SUBSYSTEM GRID - F1 Quality */
+        .subsystem-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            max-width: 1000px;
-            padding: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2.5rem;
+            margin-top: 6rem;
+            max-width: 1400px;
+            padding: 0 2rem;
         }
 
-        .subsystem {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
+        .subsystem-card {
+            background: linear-gradient(145deg, var(--glass-primary), var(--glass-secondary));
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 3rem 2rem;
             text-align: center;
             cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
 
-        .subsystem:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(255,107,53,0.3);
-            border-color: #ff6b35;
+        .subsystem-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--f1-redbull-blue);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            z-index: -1;
         }
 
-        .subsystem i {
+        .subsystem-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--f1-mercedes-silver);
+            transform: scaleX(0);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .subsystem-card:hover {
+            transform: translateY(-20px) scale(1.03);
+            box-shadow: 0 40px 100px rgba(0,245,255,0.2);
+            border-color: var(--neon-glow-cyan);
+        }
+
+        .subsystem-card:hover::before { opacity: 0.1; }
+        .subsystem-card:hover::after { transform: scaleX(1); }
+
+        .subsystem-icon {
             font-size: 4rem;
             display: block;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #ff6b35, #00d4ff);
+            margin-bottom: 1.8rem;
+            background: var(--f1-mercedes-silver);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(192,192,192,0.5));
+            transition: all 0.4s ease;
         }
 
-        /* Dashboard */
+        .subsystem-card:hover .subsystem-icon {
+            filter: drop-shadow(0 0 40px var(--neon-glow-cyan));
+            transform: scale(1.1);
+        }
+
+        .subsystem-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* DASHBOARD SECTIONS */
         .dashboard {
             min-height: 100vh;
-            padding: 2rem;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            padding: 3rem 2rem;
+            background: 
+                radial-gradient(ellipse 80% 50% at 20% 30%, rgba(0,245,255,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 60% 40% at 80% 70%, rgba(255,0,255,0.06) 0%, transparent 50%),
+                linear-gradient(135deg, var(--f1-charcoal) 0%, var(--f1-black) 100%);
             display: none;
         }
 
-        .dashboard h1 {
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .dashboard-title {
             font-family: 'Orbitron', monospace;
-            font-size: 3rem;
-            background: linear-gradient(45deg, #ff6b35, #00d4ff);
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            background: var(--f1-mercedes-silver);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
+            background-clip: text;
+            filter: drop-shadow(0 0 40px rgba(192,192,192,0.4));
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            background: var(--glass-primary);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .status-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--neon-glow-cyan);
+            box-shadow: 0 0 20px var(--neon-glow-cyan);
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
         }
 
         .back-btn {
-            position: absolute;
-            top: 2rem;
-            left: 2rem;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 1rem 2rem;
+            background: var(--glass-primary);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 1.2rem 2.5rem;
             border-radius: 50px;
-            cursor: pointer;
             font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .back-btn:hover { background: #ff6b35; }
+        .back-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--f1-redbull-blue);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+            z-index: -1;
+        }
 
-        .sensors {
+        .back-btn:hover {
+            transform: translateX(-8px);
+            box-shadow: 0 20px 40px rgba(0,245,255,0.2);
+            border-color: var(--neon-glow-cyan);
+        }
+
+        .back-btn:hover::before { transform: translateX(0); }
+
+        /* TELEMETRY CARDS */
+        .telemetry-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
         }
 
-        .sensor-card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            text-align: center;
+        .telemetry-card {
+            background: linear-gradient(145deg, var(--glass-primary), var(--glass-secondary));
+            backdrop-filter: blur(40px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .telemetry-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--f1-ferrari-red);
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+        }
+
+        .telemetry-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 40px 100px rgba(255,0,255,0.15);
+            border-color: var(--neon-glow-magenta);
+        }
+
+        .telemetry-card:hover::before { transform: scaleX(1); }
+
+        .sensor-label {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            color: var(--neon-glow-cyan);
+            margin-bottom: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .sensor-value {
             font-family: 'Orbitron', monospace;
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, #00d4ff, #ff6b35);
+            font-size: clamp(3rem, 10vw, 5rem);
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: var(--f1-mercedes-silver);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
         }
+
+        .sensor-unit {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .dashboard { padding: 2rem 1rem; }
+            .subsystem-grid { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+            .telemetry-grid { grid-template-columns: 1fr; }
+        }
+
+        /* PAGE VISIBILITY */
+        [data-page] { display: none; }
+        #landing { display: flex; }
     </style>
 </head>
 <body>
-    <!-- LANDING -->
-    <div id="landing" class="landing">
-        <h1 class="team-title">SAKTHI RACING</h1>
-        <p style="font-size: 1.5rem; margin-bottom: 3rem; opacity: 0.9;">
-            VORTEX PITWALL TELEMETRY<br>
-            <small>Formula Student India 2026</small>
-        </p>
-        <button class="enter-btn" onclick="showDashboard('powertrain')">ENTER DASHBOARD</button>
-        
-        <div class="subsystems">
-            <div class="subsystem" onclick="showDashboard('powertrain')">
-                <i class="fas fa-cog"></i>
-                <div>POWERTRAIN</div>
-            </div>
-            <div class="subsystem" onclick="showDashboard('suspension')">
-                <i class="fas fa-car-battery"></i>
-                <div>SUSPENSION</div>
-            </div>
-            <div class="subsystem" onclick="showDashboard('brakes')">
-                <i class="fas fa-stopwatch"></i>
-                <div>BRAKES</div>
-            </div>
-            <div class="subsystem" onclick="showDashboard('chassis')">
-                <i class="fas fa-car"></i>
-                <div>CHASSIS</div>
-            </div>
-            <div class="subsystem" onclick="showDashboard('electrical')">
-                <i class="fas fa-bolt"></i>
-                <div>ELECTRICAL</div>
-            </div>
-            <div class="subsystem" onclick="showDashboard('embedded')">
-                <i class="fas fa-microchip"></i>
-                <div>EMBEDDED</div>
-            </div>
+    <!-- LOADING SCREEN -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="loading-title">VORTEX PITWALL</h1>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
         </div>
     </div>
+
+    <!-- LANDING PAGE -->
+    <section id="landing" data-page="landing" class="landing">
+        <div class="hero-content">
+            <h1 class="team-title">SAKTHI RACING</h1>
+            <p class="team-subtitle">
+                FORMULA STUDENT INDIA 2026<br>
+                <span style="font-weight: 600; letter-spacing: 1px;">ADVANCED VEHICLE TELEMETRY SYSTEM</span>
+            </p>
+            <button class="enter-btn" onclick="enterPitwall()">
+                <i class="fas fa-play-circle" style="margin-right: 1rem;"></i>
+                ENTER PITWALL
+            </button>
+        </div>
+
+        <div class="subsystem-grid">
+            <div class="subsystem-card" onclick="showDashboard('powertrain')">
+                <i class="fas fa-cogs subsystem-icon"></i>
+                <div class="subsystem-title">POWERTRAIN</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('suspension')">
+                <i class="fas fa-car-battery subsystem-icon"></i>
+                <div class="subsystem-title">SUSPENSION</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('brakes')">
+                <i class="fas fa-stopwatch subsystem-icon"></i>
+                <div class="subsystem-title">BRAKES</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('chassis')">
+                <i class="fas fa-car-side subsystem-icon"></i>
+                <div class="subsystem-title">CHASSIS</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('electrical')">
+                <i class="fas fa-bolt subsystem-icon"></i>
+                <div class="subsystem-title">ELECTRICAL</div>
+            </div>
+            <div class="subsystem-card" onclick="showDashboard('embedded')">
+                <i class="fas fa-microchip subsystem-icon"></i>
+                <div class="subsystem-title">EMBEDDED</div>
+            </div>
+        </div>
+    </section>
 
     <!-- POWERTRAIN DASHBOARD -->
-    <div id="powertrain" class="dashboard">
-        <button class="back-btn" onclick="showLanding()">← BACK</button>
-        <h1>POWERTRAIN TELEMETRY</h1>
-        <div class="sensors" id="powertrain-sensors">
-            <!-- Live data here -->
+    <section id="powertrain" data-page="powertrain" class="dashboard">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">POWERTRAIN TELEMETRY</h1>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                LIVE DATA STREAM
+            </div>
+            <button class="back-btn" onclick="showLanding()">
+                <i class="fas fa-arrow-left"></i> BACK TO PITWALL
+            </button>
         </div>
-    </div>
 
-    <!-- Add
+        <div class="telemetry-grid" id="powertrainSensors">
+            <!-- Live sensors populated by JS -->
+        </div>
+    </section>
+
+    <!-- SUSPENSION DASHBOARD -->
+    <section id="suspension" data-page="suspension" class="dashboard" style="display: none;">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">SUSPENSION TELEMETRY</h1>
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                LIVE DATA STREAM
+            </div>
+            <button class="back-btn" onclick="showLanding()">
+                <i class="fas fa-arrow-left"></i> BACK TO PITWALL
+            </button>
+        </div>
+        <div class="telemetry-grid">
+            <div class="telemetry-card">
+                <div class="sensor-label">FRONT LEFT TRAVEL</div>
+                <div class="sensor-value" style="animation: pulse 2s infinite;">47mm</div>
+                <div class="sensor-unit">RIDE HEIGHT</div>
+            </div>
+            <!-- More sensors... -->
+        </div>
+    </section>
+
+    <script>
+        // WORLD-CLASS TELEMETRY SIMULATION
+        const telemetryData = {
+            powertrain: {
+                lambda: { value: 0.92, min: 0.7, max: 1.3 },
+                tps: { value: 42, min: 0, max: 100 },
+                ect: { value: 87, min: 60, max: 105 },
+                radiator: { value: 76, min: 50, max: 95 }
+            }
+        };
+
+        let currentPage = 'landing';
+
+        // Initialize
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(() => document.getElementById('loadingScreen').remove(), 500);
+            }, 3500);
+        });
+
+        function enterPitwall() {
+            document.querySelectorAll('[data-page]').forEach(page => {
+                page.style.display = 'none';
+            });
+            showDashboard('powertrain');
+        }
+
+        function showLanding() {
+            document.querySelectorAll('[data-page]').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById('landing').style.display = 'flex';
+            currentPage = 'landing';
+        }
+
+        function showDashboard(pageId) {
+            document.querySelectorAll('[data-page]').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById(pageId).style.display = 'block';
+            currentPage = pageId;
+            
+            if (pageId === 'powertrain') initPowertrainDashboard();
+        }
+
+        function initPowertrainDashboard() {
+            const container = document.getElementById('powertrainSensors');
+            container.innerHTML = `
+                <div class="telemetry-card">
+                    <div class="sensor-label">LAMBDA SENSOR</div>
+                    <div class="sensor-value" id="lambdaValue">0.92</div>
+                    <div class="sensor-unit">AFR</div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="sensor-label">THROTTLE POSITION</div>
+                    <div class="sensor-value" id="tpsValue">42</div>
+                    <div class="sensor-unit">%</div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="sensor-label">ENGINE COOLANT</div>
+                    <div class="sensor-value" id="ectValue">87</div>
+                    <div class="sensor-unit">°C</div>
+                </div>
+                <div class="telemetry-card">
+                    <div class="sensor-label">RADIATOR TEMP</div>
+                    <div class="sensor-value" id="radiatorValue">76</div>
+                    <div class="sensor-unit">°C</div>
+                </div>
+            `;
+            startLiveUpdates();
+        }
+
+        function startLiveUpdates() {
+            setInterval(() => {
+                if (currentPage === 'powertrain') {
+                    telemetryData.powertrain.lambda.value = 0.85 + Math.sin(Date.now() * 0.0015) * 0.15;
+                    telemetryData.powertrain.tps.value = 25 + Math.sin(Date.now() * 0.001) * 75;
+                    telemetryData.powertrain.ect.value = 78 + Math.sin(Date.now() * 0.0008) * 12;
+                    telemetryData.powertrain.radiator.value = 72 + Math.sin(Date.now() * 0.0009) * 10;
+
+                    document.getElementById('lambdaValue').textContent = telemetryData.powertrain.lambda.value.toFixed(2);
+                    document.getElementById('tpsValue').textContent = Math.round(telemetryData.powertrain.tps.value);
+                    document.getElementById('ectValue').textContent = Math.round(telemetryData.powertrain.ect.value);
+                    document.getElementById('radiatorValue').textContent = Math.round(telemetryData.powertrain.radiator.value);
+                }
+            }, 800);
+        }
+    </script>
+</body>
+</html>
