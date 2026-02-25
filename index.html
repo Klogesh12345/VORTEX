@@ -1,753 +1,221 @@
-<!DOCTYPE html>
+
+     <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAKTHI RACING | VORTEX PITWALL - Formula Student Telemetry</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>SAKTHI RACING | VORTEX PITWALL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js" rel="stylesheet">
     <style>
-        :root {
-            --black: #0a0a0a;
-            --dark-gray: #1a1a1a;
-            --glass-1: rgba(255,255,255,0.05);
-            --glass-2: rgba(255,255,255,0.08);
-            --border-glass: rgba(255,255,255,0.12);
-            --accent-orange: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-            --accent-blue: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
-            --neon-green: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
-            --warning-red: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255,255,255,0.8);
-            --text-muted: rgba(255,255,255,0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: var(--black);
-            color: var(--text-primary);
+            background: #0a0a0a;
+            color: white;
             overflow-x: hidden;
-            line-height: 1.6;
         }
 
-        /* Loading Screen */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--black);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 1s ease-out;
-        }
-
-        .loading-logo {
-            font-family: 'Orbitron', monospace;
-            font-size: clamp(2rem, 5vw, 4rem);
-            background: var(--accent-orange);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: glow 2s ease-in-out infinite alternate;
-            margin-bottom: 2rem;
-        }
-
-        .loading-bar {
-            width: 300px;
-            height: 4px;
-            background: var(--glass-1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .loading-progress {
-            height: 100%;
-            background: var(--accent-orange);
-            width: 0%;
-            border-radius: 2px;
-            animation: load 3s ease-out forwards;
-        }
-
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 10px rgba(255,107,53,0.5)); }
-            to { filter: drop-shadow(0 0 25px rgba(255,107,53,0.8)); }
-        }
-
-        @keyframes load { to { width: 100%; } }
-
-        /* Landing Page */
+        /* FALLBACK + WORKING BACKGROUND */
         .landing {
             height: 100vh;
-            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            overflow: hidden;
-        }
-
-        .landing::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: 
-                linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%),
-                url('145.jpeg') center/cover no-repeat fixed;
-            z-index: -2;
-            filter: brightness(0.6) contrast(1.1);
-        }
-
-        .landing-content {
             position: relative;
-            z-index: 2;
-            max-width: 900px;
-            padding: 0 2rem;
+            background: 
+                /* TRY 3 METHODS - ONE WILL WORK */
+                linear-gradient(135deg, rgba(15,15,20,0.9), rgba(0,0,0,0.8)),
+                /* METHOD 1: Your GitHub raw URL - REPLACE YOUR_USERNAME */
+                url('https://raw.githubusercontent.com/YOUR_USERNAME/vortex-pitwall/main/145.jpeg') center/cover no-repeat fixed,
+                /* METHOD 2: Relative path */
+                url('./145.jpeg') center/cover no-repeat fixed,
+                /* METHOD 3: Fallback gradient */
+                linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
 
         .team-title {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(4rem, 10vw, 8rem);
+            font-size: clamp(4rem, 12vw, 8rem);
             font-weight: 900;
-            background: var(--accent-orange);
+            background: linear-gradient(45deg, #ff6b35, #00d4ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 0.9;
-            margin-bottom: 1.5rem;
-            animation: titleFloat 6s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255,107,53,0.5);
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
-        @keyframes titleFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px rgba(255,107,53,0.5)); }
+            to { filter: drop-shadow(0 0 40px rgba(255,107,53,0.8)); }
         }
 
-        .team-subtitle {
-            font-size: clamp(1.2rem, 3vw, 1.8rem);
-            color: var(--text-secondary);
-            font-weight: 400;
-            margin-bottom: 3rem;
-            letter-spacing: 2px;
-        }
-
-        .enter-dashboard {
+        .enter-btn {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-size: 1.4rem;
             font-weight: 700;
-            padding: 1.5rem 4rem;
-            background: linear-gradient(45deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            padding: 1.5rem 3rem;
+            background: rgba(255,255,255,0.15);
             backdrop-filter: blur(20px);
-            border: 2px solid transparent;
+            border: 2px solid rgba(255,107,53,0.5);
             border-radius: 50px;
-            color: var(--text-primary);
+            color: white;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            margin: 2rem 0;
+            transition: all 0.3s ease;
         }
 
-        .enter-dashboard::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.6s;
+        .enter-btn:hover {
+            background: rgba(255,107,53,0.2);
+            box-shadow: 0 0 30px rgba(255,107,53,0.5);
+            transform: scale(1.05);
         }
 
-        .enter-dashboard:hover {
-            transform: translateY(-8px) scale(1.05);
-            border-color: rgba(255,107,53,0.5);
-            box-shadow: 0 30px 60px rgba(255,107,53,0.3);
-        }
-
-        .enter-dashboard:hover::before { left: 100%; }
-
-        /* Subsystem Grid */
-        .subsystem-grid {
+        .subsystems {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 2rem;
-            margin-top: 5rem;
-            max-width: 1200px;
-            padding: 0 2rem;
+            max-width: 1000px;
+            padding: 2rem;
         }
 
-        .subsystem-card {
-            background: linear-gradient(145deg, var(--glass-1), var(--glass-2));
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 2.5rem 1.5rem;
+        .subsystem {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
             text-align: center;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
         }
 
-        .subsystem-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--accent-orange);
-            transform: scaleX(0);
-            transition: transform 0.4s ease;
+        .subsystem:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255,107,53,0.3);
+            border-color: #ff6b35;
         }
 
-        .subsystem-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            box-shadow: 0 30px 80px rgba(255,107,53,0.3);
-            border-color: rgba(255,107,53,0.4);
-        }
-
-        .subsystem-card:hover::before { transform: scaleX(1); }
-
-        .subsystem-icon {
-            font-size: 3.5rem;
+        .subsystem i {
+            font-size: 4rem;
             display: block;
-            margin-bottom: 1.5rem;
-            background: var(--accent-blue);
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b35, #00d4ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 20px rgba(0,195,255,0.5));
         }
 
-        .subsystem-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: 1px;
-        }
-
-        /* Dashboard Layout */
+        /* Dashboard */
         .dashboard {
             min-height: 100vh;
             padding: 2rem;
-            background: radial-gradient(ellipse at center, #1a1a2e 0%, var(--black) 70%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
             display: none;
         }
 
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .dashboard-title {
+        .dashboard h1 {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 800;
-            background: var(--accent-orange);
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ff6b35, #00d4ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 2rem;
         }
 
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            background: var(--glass-1);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .status-online {
-            color: #00ff88;
-            border-color: rgba(0,255,136,0.3);
-            box-shadow: 0 0 20px rgba(0,255,136,0.2);
-        }
-
-        .back-button {
-            background: var(--glass-1);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            color: var(--text-primary);
+        .back-btn {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
             padding: 1rem 2rem;
             border-radius: 50px;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-family: 'Orbitron', monospace;
         }
 
-        .back-button:hover {
-            background: var(--accent-blue);
-            border-color: rgba(0,195,255,0.5);
-            transform: translateX(-5px);
-        }
+        .back-btn:hover { background: #ff6b35; }
 
-        /* Telemetry Grid */
-        .telemetry-grid {
+        .sensors {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 2rem;
-            margin-bottom: 3rem;
+            margin: 2rem 0;
         }
 
-        .telemetry-card {
-            background: linear-gradient(145deg, var(--glass-1), var(--glass-2));
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
+        .sensor-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
             padding: 2rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .telemetry-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-        }
-
-        .telemetry-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--accent-orange);
-            transform: scaleX(0);
-            transition: transform 0.4s ease;
-        }
-
-        .telemetry-card:hover::before { transform: scaleX(1); }
-
-        .sensor-label {
-            font-family: 'Orbitron', monospace;
-            font-size: 1rem;
-            color: var(--accent-blue);
-            margin-bottom: 0.5rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
         }
 
         .sensor-value {
             font-family: 'Orbitron', monospace;
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            font-weight: 800;
-            margin-bottom: 0.25rem;
-            background: var(--accent-orange);
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00d4ff, #ff6b35);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1;
         }
-
-        .sensor-unit {
-            font-size: 1rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* Charts */
-        .chart-container {
-            background: linear-gradient(145deg, var(--glass-1), var(--glass-2));
-            backdrop-filter: blur(25px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 2rem;
-            margin-bottom: 3rem;
-            height: 450px;
-        }
-
-        .chart-wrapper {
-            height: 100%;
-            position: relative;
-        }
-
-        /* Inference Panel */
-        .inference-panel {
-            background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(0,195,255,0.08));
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 2.5rem;
-        }
-
-        .inference-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 1.5rem;
-            color: var(--accent-orange);
-            margin-bottom: 2rem;
-            letter-spacing: 1px;
-        }
-
-        .inference-item {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            padding: 1.5rem;
-            background: var(--glass-1);
-            border-radius: 16px;
-            margin-bottom: 1rem;
-            border-right: 4px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .inference-item:hover {
-            transform: translateX(8px);
-            border-right-color: var(--accent-blue);
-        }
-
-        .status-indicator-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            box-shadow: 0 0 20px currentColor;
-            flex-shrink: 0;
-        }
-
-        .status-ok { background: #00ff88; color: #00ff88; }
-        .status-warning { background: #ffaa00; color: #ffaa00; }
-        .status-critical { background: #ff4757; color: #ff4757; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .dashboard { padding: 1rem; }
-            .subsystem-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-            .telemetry-grid { grid-template-columns: 1fr; }
-        }
-
-        /* Page Visibility */
-        [data-page] { display: none; }
-        [data-page="landing"] { display: flex; }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loading">
-        <div class="loading-logo">VORTEX PITWALL</div>
-        <div class="loading-bar">
-            <div class="loading-progress"></div>
+    <!-- LANDING -->
+    <div id="landing" class="landing">
+        <h1 class="team-title">SAKTHI RACING</h1>
+        <p style="font-size: 1.5rem; margin-bottom: 3rem; opacity: 0.9;">
+            VORTEX PITWALL TELEMETRY<br>
+            <small>Formula Student India 2026</small>
+        </p>
+        <button class="enter-btn" onclick="showDashboard('powertrain')">ENTER DASHBOARD</button>
+        
+        <div class="subsystems">
+            <div class="subsystem" onclick="showDashboard('powertrain')">
+                <i class="fas fa-cog"></i>
+                <div>POWERTRAIN</div>
+            </div>
+            <div class="subsystem" onclick="showDashboard('suspension')">
+                <i class="fas fa-car-battery"></i>
+                <div>SUSPENSION</div>
+            </div>
+            <div class="subsystem" onclick="showDashboard('brakes')">
+                <i class="fas fa-stopwatch"></i>
+                <div>BRAKES</div>
+            </div>
+            <div class="subsystem" onclick="showDashboard('chassis')">
+                <i class="fas fa-car"></i>
+                <div>CHASSIS</div>
+            </div>
+            <div class="subsystem" onclick="showDashboard('electrical')">
+                <i class="fas fa-bolt"></i>
+                <div>ELECTRICAL</div>
+            </div>
+            <div class="subsystem" onclick="showDashboard('embedded')">
+                <i class="fas fa-microchip"></i>
+                <div>EMBEDDED</div>
+            </div>
         </div>
     </div>
 
-    <!-- Landing Page -->
-    <section id="landing" data-page="landing" class="landing">
-        <div class="landing-content">
-            <h1 class="team-title">SAKTHI RACING</h1>
-            <p class="team-subtitle">
-                FORMULA STUDENT INDIA 2026<br>
-                <span style="font-size: 0.7em; opacity: 0.8;">VEHICLE TELEMETRY & DATA ACQUISITION SYSTEM</span>
-            </p>
-            <button class="enter-dashboard" onclick="enterDashboard()">
-                <i class="fas fa-tachometer-alt"></i> ENTER DASHBOARD
-            </button>
+    <!-- POWERTRAIN DASHBOARD -->
+    <div id="powertrain" class="dashboard">
+        <button class="back-btn" onclick="showLanding()">← BACK</button>
+        <h1>POWERTRAIN TELEMETRY</h1>
+        <div class="sensors" id="powertrain-sensors">
+            <!-- Live data here -->
         </div>
+    </div>
 
-        <div class="subsystem-grid">
-            <div class="subsystem-card" onclick="showDashboard('powertrain')">
-                <i class="fas fa-cog subsystem-icon"></i>
-                <div class="subsystem-title">POWERTRAIN</div>
-            </div>
-            <div class="subsystem-card" onclick="showDashboard('suspension')">
-                <i class="fas fa-car-battery subsystem-icon"></i>
-                <div class="subsystem-title">SUSPENSION</div>
-            </div>
-            <div class="subsystem-card" onclick="showDashboard('brakes')">
-                <i class="fas fa-stopwatch subsystem-icon"></i>
-                <div class="subsystem-title">BRAKES</div>
-            </div>
-            <div class="subsystem-card" onclick="showDashboard('chassis')">
-                <i class="fas fa-car subsystem-icon"></i>
-                <div class="subsystem-title">CHASSIS</div>
-            </div>
-            <div class="subsystem-card" onclick="showDashboard('electrical')">
-                <i class="fas fa-bolt subsystem-icon"></i>
-                <div class="subsystem-title">ELECTRICAL</div>
-            </div>
-            <div class="subsystem-card" onclick="showDashboard('embedded')">
-                <i class="fas fa-microchip subsystem-icon"></i>
-                <div class="subsystem-title">EMBEDDED</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Powertrain Dashboard -->
-    <section id="powertrain" data-page="powertrain" class="dashboard">
-        <div class="dashboard-header">
-            <h1 class="dashboard-title">POWERTRAIN TELEMETRY</h1>
-            <div class="status-indicator status-online">
-                <div class="status-indicator-dot status-ok"></div>
-                LIVE DATA STREAM
-            </div>
-            <button class="back-button" onclick="showLanding()">
-                <i class="fas fa-arrow-left"></i> BACK TO DASHBOARD
-            </button>
-        </div>
-
-        <div class="telemetry-grid" id="powertrain-sensors">
-            <!-- Dynamic content -->
-        </div>
-
-        <div class="chart-container">
-            <div class="chart-wrapper">
-                <canvas id="powertrain-chart"></canvas>
-            </div>
-        </div>
-
-        <div class="inference-panel">
-            <h3 class="inference-title">ENGINEERING ANALYSIS</h3>
-            <div id="powertrain-inference">
-                <!-- Dynamic content -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Suspension Dashboard -->
-    <section id="suspension" data-page="suspension" class="dashboard">
-        <div class="dashboard-header">
-            <h1 class="dashboard-title">SUSPENSION TELEMETRY</h1>
-            <div class="status-indicator status-online">
-                <div class="status-indicator-dot status-ok"></div>
-                LIVE DATA STREAM
-            </div>
-            <button class="back-button" onclick="showLanding()">
-                <i class="fas fa-arrow-left"></i> BACK TO DASHBOARD
-            </button>
-        </div>
-        <div class="telemetry-grid" id="suspension-sensors"></div>
-        <div class="chart-container">
-            <canvas id="suspension-chart"></canvas>
-        </div>
-        <div class="inference-panel">
-            <h3 class="inference-title">SUSPENSION ANALYSIS</h3>
-            <div id="suspension-inference"></div>
-        </div>
-    </section>
-
-    <script>
-        // Telemetry Simulation Data
-        const telemetry = {
-            powertrain: {
-                sensors: {
-                    lambda: { value: 0.92, unit: 'AFR', range: [0.7, 1.3] },
-                    tps: { value: 42, unit: '%', range: [0, 100] },
-                    ect: { value: 87, unit: '°C', range: [60, 105] },
-                    radiator: { value: 76, unit: '°C', range: [50, 95] }
-                },
-                history: { time: [], lambda: [], tps: [], ect: [], radiator: [] },
-                charts: null
-            },
-            suspension: {
-                sensors: {
-                    fl_travel: { value: 45, unit: 'mm', range: [0, 100] },
-                    fr_travel: { value: 48, unit: 'mm', range: [0, 100] },
-                    rl_travel: { value: 42, unit: 'mm', range: [0, 100] },
-                    rr_travel: { value: 46, unit: 'mm', range: [0, 100] }
-                },
-                history: { time: [], fl: [], fr: [], rl: [], rr: [] }
-            }
-        };
-
-        // Initialize app
-        let currentPage = 'landing';
-        let animationId;
-
-        function init() {
-            setTimeout(() => {
-                document.getElementById('loading').style.opacity = '0';
-                setTimeout(() => document.getElementById('loading').remove(), 1000);
-            }, 3000);
-
-            startSimulation();
-        }
-
-        function startSimulation() {
-            function updateData() {
-                // Powertrain simulation
-                telemetry.powertrain.sensors.lambda.value = 0.85 + Math.sin(Date.now() * 0.0015) * 0.15;
-                telemetry.powertrain.sensors.tps.value = 25 + Math.sin(Date.now() * 0.001) * 75;
-                telemetry.powertrain.sensors.ect.value = 78 + Math.sin(Date.now() * 0.0008) * 12;
-                telemetry.powertrain.sensors.radiator.value = 72 + Math.sin(Date.now() * 0.0009) * 10;
-
-                // Add to history (keep last 50 points)
-                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-                telemetry.powertrain.history.time.push(time);
-                telemetry.powertrain.history.lambda.push(telemetry.powertrain.sensors.lambda.value);
-                telemetry.powertrain.history.tps.push(telemetry.powertrain.sensors.tps.value);
-                telemetry.powertrain.history.ect.push(telemetry.powertrain.sensors.ect.value);
-                telemetry.powertrain.history.radiator.push(telemetry.powertrain.sensors.radiator.value);
-
-                Object.values(telemetry.powertrain.history).forEach(history => {
-                    if (history.length > 50) history.shift();
-                });
-
-                // Update active dashboard
-                if (currentPage !== 'landing') {
-                    updateDashboard(currentPage);
-                }
-
-                animationId = requestAnimationFrame(updateData);
-            }
-            updateData();
-        }
-
-        function enterDashboard() {
-            document.querySelectorAll('[data-page]').forEach(page => page.style.display = 'none');
-            currentPage = 'landing';
-        }
-
-        function showDashboard(page) {
-            document.querySelectorAll('[data-page]').forEach(p => p.style.display = 'none');
-            document.getElementById(page).style.display = 'block';
-            currentPage = page;
-            initDashboard(page);
-        }
-
-        function showLanding() {
-            document.querySelectorAll('[data-page]').forEach(p => p.style.display = 'none');
-            document.getElementById('landing').style.display = 'flex';
-            currentPage = 'landing';
-            cancelAnimationFrame(animationId);
-        }
-
-        function initDashboard(page) {
-            if (page === 'powertrain') initPowertrain();
-            if (page === 'suspension') initSuspension();
-        }
-
-        function initPowertrain() {
-            const sensors = telemetry.powertrain.sensors;
-            const container = document.getElementById('powertrain-sensors');
-            
-            container.innerHTML = `
-                ${Object.entries(sensors).map(([key, sensor]) => `
-                    <div class="telemetry-card">
-                        <div class="sensor-label">${key.toUpperCase()}</div>
-                        <div class="sensor-value" data-sensor="${key}">${sensor.value.toFixed(2)}</div>
-                        <div class="sensor-unit">${sensor.unit}</div>
-                    </div>
-                `).join('')}
-            `;
-
-            // Chart
-            const ctx = document.getElementById('powertrain-chart').getContext('2d');
-            if (telemetry.powertrain.charts) telemetry.powertrain.charts.destroy();
-            
-            telemetry.powertrain.charts = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: telemetry.powertrain.history.time.slice(-20),
-                    datasets: [
-                        {
-                            label: 'Lambda (AFR)',
-                            data: telemetry.powertrain.history.lambda.slice(-20),
-                            borderColor: '#00d4ff',
-                            backgroundColor: 'rgba(0,212,255,0.1)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'ECT (°C)',
-                            data: telemetry.powertrain.history.ect.slice(-20),
-                            borderColor: '#ff6b35',
-                            backgroundColor: 'rgba(255,107,53,0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#ffffff', font: { family: 'Orbitron' } } } },
-                    scales: {
-                        x: { ticks: { color: 'rgba(255,255,255,0.7)' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { ticks: { color: 'rgba(255,255,255,0.7)' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-                    }
-                }
-            });
-
-            updatePowertrainInference();
-        }
-
-        function updatePowertrainInference() {
-            const sensors = telemetry.powertrain.sensors;
-            const container = document.getElementById('powertrain-inference');
-            
-            const lambdaStatus = sensors.lambda.value > 1.1 ? 'status-warning' : 'status-ok';
-            const tempStatus = sensors.ect.value > 100 ? 'status-critical' : 'status-ok';
-            
-            container.innerHTML = `
-                <div class="inference-item">
-                    <div class="status-indicator-dot ${lambdaStatus}"></div>
-                    <div>
-                        <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem;">
-                            ${sensors.lambda.value > 1.1 ? '⚠️ LEAN MIXTURE' : '✅ OPTIMAL MIXTURE'}
-                        </div>
-                        <div style="font-size: 0.9rem; opacity: 0.8;">Lambda: ${sensors.lambda.value.toFixed(2)} AFR</div>
-                    </div>
-                </div>
-                <div class="inference-item">
-                    <div class="status-indicator-dot ${tempStatus}"></div>
-                    <div>
-                        <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem;">
-                            ${sensors.ect.value > 100 ? '🔥 OVERHEAT RISK' : '✅ THERMAL SAFE'}
-                        </div>
-                        <div style="font-size: 0.9rem; opacity: 0.8;">ECT: ${sensors.ect.value.toFixed(1)}°C</div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateDashboard(page) {
-            if (page === 'powertrain') {
-                // Update sensor values
-                document.querySelectorAll('[data-sensor]').forEach(el => {
-                    const sensor = el.dataset.sensor;
-                    el.textContent = telemetry.powertrain.sensors[sensor].value.toFixed(2);
-                });
-                updatePowertrainInference();
-                
-                // Update chart
-                if (telemetry.powertrain.charts) {
-                    telemetry.powertrain.charts.data.labels = telemetry.powertrain.history.time.slice(-20);
-                    telemetry.powertrain.charts.data.datasets[0].data = telemetry.powertrain.history.lambda.slice(-20);
-                    telemetry.powertrain.charts.data.datasets[1].data = telemetry.powertrain.history.ect.slice(-20);
-                    telemetry.powertrain.charts.update('none');
-                }
-            }
-        }
-
-        // Initialize
-        init();
-    </script>
-</body>
-</html>
+    <!-- Add
