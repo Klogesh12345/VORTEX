@@ -2,8 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sakthi Racing Telemetry Pro</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Sakthi Racing Telemetry</title>
+
+<!-- ICON LIBRARY -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 body{
@@ -11,205 +13,153 @@ body{
     font-family:Arial;
     background:#0f172a;
     color:white;
+    scroll-behavior:smooth;
 }
 
 /* SIDEBAR */
 
 .sidebar{
     position:fixed;
+    left:0;
+    top:0;
     height:100%;
-    width:90px;
+    width:80px;
     background:#111827;
     display:flex;
     flex-direction:column;
     align-items:center;
     padding-top:30px;
-    gap:25px;
+    gap:40px;
+    z-index:1000;
 }
 
-.sidebar button{
-    background:none;
-    border:none;
+.sidebar a{
     color:#00f7ff;
-    cursor:pointer;
-    font-size:12px;
-    writing-mode:vertical-rl;
-    transform:rotate(180deg);
+    font-size:22px;
+    text-decoration:none;
+    transition:0.3s;
 }
 
-.sidebar button:hover{
+.sidebar a:hover{
     color:#00ff88;
+    transform:scale(1.2);
 }
 
-/* CONTENT */
-
-.content{
-    margin-left:110px;
-    padding:40px;
-}
+/* MAIN CONTENT */
 
 .section{
-    display:none;
+    min-height:100vh;
+    padding:80px 120px;
+    margin-left:80px;
 }
 
-.section.active{
-    display:block;
+/* FRONT PAGE */
+
+.hero{
+    background:linear-gradient(to right,#000000aa,#000000aa),
+               url("145.jpeg") center/cover no-repeat;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
 }
 
-canvas{
-    background:#111;
-    padding:20px;
-    border-radius:10px;
-    margin-top:20px;
+.hero h1{
+    font-size:60px;
+    color:#00f7ff;
 }
 
-/* DOWNLOAD BUTTON */
+.hero p{
+    font-size:20px;
+    margin-top:10px;
+}
 
-.download{
-    margin-top:20px;
-    padding:10px 20px;
+.scroll-btn{
+    margin-top:40px;
+    padding:12px 25px;
     background:#00f7ff;
     border:none;
     cursor:pointer;
+    font-size:16px;
 }
 
-/* FUSE */
+/* SUBSYSTEM SECTIONS */
 
-.fuse{
-    display:inline-block;
-    width:20px;
-    height:20px;
-    border-radius:50%;
-    background:lime;
-    margin:5px;
+.subsystem{
+    background:#111827;
 }
-.fuse.off{
-    background:red;
+
+h2{
+    color:#00f7ff;
+}
+
+.card{
+    background:#1f2937;
+    padding:20px;
+    border-radius:10px;
+    margin-top:20px;
 }
 </style>
 </head>
 <body>
 
+<!-- SIDEBAR ICONS -->
 <div class="sidebar">
-    <button onclick="showSection('power')">POWERTRAIN</button>
-    <button onclick="showSection('suspension')">SUSPENSION</button>
-    <button onclick="showSection('brakes')">BRAKES</button>
-    <button onclick="showSection('electrical')">ELECTRICAL</button>
-    <button onclick="showSection('embedded')">EMBEDDED</button>
+    <a href="#home"><i class="fas fa-house"></i></a>
+    <a href="#power"><i class="fas fa-engine"></i></a>
+    <a href="#suspension"><i class="fas fa-car-side"></i></a>
+    <a href="#brakes"><i class="fas fa-stop"></i></a>
+    <a href="#electrical"><i class="fas fa-bolt"></i></a>
+    <a href="#embedded"><i class="fas fa-microchip"></i></a>
 </div>
 
-<div class="content">
+<!-- FRONT PAGE -->
+<section id="home" class="section hero">
+    <h1>SAKTHI RACING CV-49</h1>
+    <p>Professional Telemetry & Data Analysis System</p>
+    <button class="scroll-btn" onclick="location.href='#power'">
+        View Dashboard ↓
+    </button>
+</section>
 
 <!-- POWERTRAIN -->
-<div id="power" class="section active">
-<h2>Powertrain</h2>
-<p>Speed: <span id="speedVal">80</span> km/h</p>
-<p>RPM: <span id="rpmVal">6500</span></p>
-<canvas id="powerChart"></canvas>
-<button class="download" onclick="downloadReport('Powertrain Report')">Download Report</button>
-</div>
+<section id="power" class="section subsystem">
+    <h2>Powertrain</h2>
+    <div class="card">
+        Speed, RPM, TPS, Gear Position, ECT, IAC, Radiator Temp Graphs will appear here.
+    </div>
+</section>
 
 <!-- SUSPENSION -->
-<div id="suspension" class="section">
-<h2>Suspension</h2>
-<p>Load Cells & Travel Graph</p>
-<canvas id="suspensionChart"></canvas>
-<button class="download" onclick="downloadReport('Suspension Report')">Download Report</button>
-</div>
+<section id="suspension" class="section subsystem">
+    <h2>Suspension</h2>
+    <div class="card">
+        4 Load Cells + 4 Suspension Travel Graphs here.
+    </div>
+</section>
 
 <!-- BRAKES -->
-<div id="brakes" class="section">
-<h2>Brakes</h2>
-<p>Brake Pressure & Rotor Temp</p>
-<canvas id="brakeChart"></canvas>
-<button class="download" onclick="downloadReport('Brake Report')">Download Report</button>
-</div>
+<section id="brakes" class="section subsystem">
+    <h2>Brakes</h2>
+    <div class="card">
+        Brake Pressure + Front/Rear Rotor Temperature Graphs here.
+    </div>
+</section>
 
 <!-- ELECTRICAL -->
-<div id="electrical" class="section">
-<h2>Electrical</h2>
-<p>Battery Voltage: 12.8V</p>
-<canvas id="electricalChart"></canvas>
-
-<h3>Fuse Status</h3>
-<div id="fuses">
-<div class="fuse"></div>
-<div class="fuse"></div>
-<div class="fuse"></div>
-<div class="fuse off"></div>
-<div class="fuse"></div>
-<div class="fuse"></div>
-</div>
-
-<button class="download" onclick="downloadReport('Electrical Report')">Download Report</button>
-</div>
+<section id="electrical" class="section subsystem">
+    <h2>Electrical</h2>
+    <div class="card">
+        Battery Voltage Graph + 6 Fuse Status Indicators here.
+    </div>
+</section>
 
 <!-- EMBEDDED -->
-<div id="embedded" class="section">
-<h2>Embedded Data</h2>
-<p>Data Transmission: <span style="color:lime;">ACTIVE</span></p>
-<button class="download" onclick="downloadReport('Embedded Report')">Download Report</button>
-</div>
-
-</div>
-
-<script>
-function showSection(id){
-    document.querySelectorAll('.section').forEach(sec=>{
-        sec.classList.remove('active');
-    });
-    document.getElementById(id).classList.add('active');
-}
-
-function downloadReport(name){
-    alert("Downloading " + name);
-}
-
-/* SAMPLE CHARTS */
-
-new Chart(document.getElementById("powerChart"),{
-type:'line',
-data:{
-labels:['1','2','3','4','5'],
-datasets:[
-{label:'Speed',data:[40,60,80,75,90]},
-{label:'RPM',data:[3000,5000,6500,6000,7000]}
-]
-}
-});
-
-new Chart(document.getElementById("suspensionChart"),{
-type:'line',
-data:{
-labels:['1','2','3','4','5'],
-datasets:[
-{label:'Load Cell FL',data:[100,120,130,110,140]},
-{label:'Travel FR',data:[10,15,12,18,14]}
-]
-}
-});
-
-new Chart(document.getElementById("brakeChart"),{
-type:'line',
-data:{
-labels:['1','2','3','4','5'],
-datasets:[
-{label:'Brake Pressure',data:[20,40,35,60,50]},
-{label:'Rotor Temp',data:[100,150,200,180,220]}
-]
-}
-});
-
-new Chart(document.getElementById("electricalChart"),{
-type:'line',
-data:{
-labels:['1','2','3','4','5'],
-datasets:[
-{label:'Battery Voltage',data:[12.6,12.7,12.8,12.75,12.9]}
-]
-}
-});
-</script>
+<section id="embedded" class="section subsystem">
+    <h2>Embedded System</h2>
+    <div class="card">
+        Data Transfer Status + Communication Health Monitoring.
+    </div>
+</section>
 
 </body>
 </html>
