@@ -1,282 +1,274 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>TSR PITWALL SYSTEM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sakthi Racing CV-49 Telemetry</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-:root{
---bg:#0b0b0f;
---card:#14141a;
---accent:#ff5c00;
---blue:#00c2ff;
---green:#00ff88;
---red:#ff2e2e;
---white:#ffffff;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Orbitron', sans-serif;
 }
-
-*{margin:0;padding:0;box-sizing:border-box;}
 
 body{
-background:var(--bg);
-color:white;
-font-family:'Rajdhani';
-display:flex;
+    background:#0b0f16;
+    color:white;
+    overflow-x:hidden;
 }
 
-/* SIDEBAR */
-.sidebar{
-width:220px;
-background:#000;
-height:100vh;
-position:fixed;
-left:0;
-top:0;
-border-right:2px solid var(--accent);
-padding-top:20px;
+.hero{
+    position:relative;
+    height:100vh;
+    width:100%;
+    background:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
+               url('145.jpg') center/cover no-repeat;
+    padding:40px 60px;
 }
 
-.sidebar h2{
-font-family:'Orbitron';
-text-align:center;
-margin-bottom:30px;
+/* TOP BAR */
+
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-.nav-btn{
-display:block;
-width:100%;
-padding:12px;
-background:none;
-border:none;
-color:white;
-text-align:left;
-padding-left:25px;
-cursor:pointer;
-font-family:'Orbitron';
-font-size:0.85rem;
-transition:0.3s;
+.cv-badge{
+    border:2px solid #ff8c00;
+    border-radius:50px;
+    padding:6px 18px;
+    color:#ff8c00;
+    font-weight:600;
 }
 
-.nav-btn:hover{
-background:var(--accent);
+.team-info{
+    display:flex;
+    gap:20px;
+    align-items:center;
+}
+
+.best-lap{
+    text-align:right;
+}
+
+.best-lap span{
+    font-size:13px;
+    color:#aaa;
+}
+
+.best-lap h2{
+    font-size:28px;
+    font-weight:800;
 }
 
 /* MAIN */
+
 .main{
-margin-left:220px;
-width:100%;
-padding:30px;
+    display:flex;
+    justify-content:space-between;
+    margin-top:80px;
 }
 
-.section{
-display:none;
+.left{
+    max-width:50%;
 }
 
-.active{
-display:block;
+.car-number{
+    font-size:160px;
+    font-weight:800;
+    color:#ff8c00;
+    line-height:0.9;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
+.car-name{
+    font-size:28px;
+    margin-top:10px;
+    letter-spacing:2px;
+}
+
+.category{
+    color:#ff8c00;
+    font-size:14px;
+    margin-top:6px;
+}
+
+.speed{
+    font-size:120px;
+    margin-top:60px;
+    font-weight:700;
+}
+
+/* TELEMETRY */
+
+.telemetry{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:25px;
+    width:40%;
 }
 
 .card{
-background:var(--card);
-padding:20px;
-border:1px solid #222;
+    background:rgba(20,25,35,0.85);
+    padding:25px;
+    border-radius:15px;
+    backdrop-filter:blur(10px);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 0 25px rgba(255,140,0,0.3);
+}
+
+.card span{
+    font-size:14px;
+    color:#aaa;
 }
 
 .card h3{
-font-family:'Orbitron';
-font-size:0.8rem;
-margin-bottom:10px;
-color:var(--blue);
+    margin-top:10px;
+    font-size:28px;
 }
 
-.value{
-font-family:'Orbitron';
-font-size:2.2rem;
-color:var(--accent);
+/* RPM BAR */
+
+.rpm-section{
+    position:absolute;
+    bottom:40px;
+    left:60px;
+    right:60px;
 }
 
-canvas{
-width:100%!important;
-height:250px!important;
+.rpm-label{
+    font-size:14px;
+    margin-bottom:8px;
 }
 
-.alert{margin-top:8px;font-family:'Orbitron';}
-.warning{color:orange;}
-.critical{color:var(--red);}
+.rpm-bar{
+    height:18px;
+    width:100%;
+    background:#222;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.rpm-fill{
+    height:100%;
+    width:70%;
+    background:linear-gradient(to right, green, yellow, orange, red);
+    border-radius:20px;
+    transition:width 0.3s ease;
+}
+
+/* SUBSYSTEM SECTION */
+
+.section{
+    padding:100px 60px;
+    background:#0f141d;
+}
+
+.section h2{
+    font-size:40px;
+    margin-bottom:40px;
+    color:#ff8c00;
+}
+
+.subsystem-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:30px;
+}
+
+.sub-card{
+    background:#161c26;
+    padding:30px;
+    border-radius:15px;
+    transition:0.3s;
+}
+
+.sub-card:hover{
+    background:#1d2430;
+    transform:translateY(-5px);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+    .main{
+        flex-direction:column;
+    }
+    .telemetry{
+        width:100%;
+        margin-top:40px;
+    }
+    .car-number{
+        font-size:120px;
+    }
+    .speed{
+        font-size:80px;
+    }
+}
 </style>
 </head>
 
 <body>
 
-<div class="sidebar">
-<h2>TSR</h2>
-<button class="nav-btn" onclick="showSection('powertrain')">POWERTRAIN</button>
-<button class="nav-btn" onclick="showSection('electrical')">ELECTRICAL</button>
-<button class="nav-btn" onclick="showSection('suspension')">SUSPENSION</button>
-<button class="nav-btn" onclick="showSection('brakes')">BRAKES</button>
-<button class="nav-btn" onclick="showSection('imu')">IMU</button>
+<div class="hero">
+
+<div class="top-bar">
+    <div class="team-info">
+        <div class="cv-badge">CV</div>
+        <div>
+            <h3>SAKTHI RACING</h3>
+            <p style="font-size:13px;color:#aaa;">FORMULA SAE – OPEN</p>
+        </div>
+    </div>
+
+    <div class="best-lap">
+        <span>BEST LAP</span>
+        <h2>01:24.387</h2>
+    </div>
 </div>
 
 <div class="main">
 
-<!-- POWERTRAIN -->
-<div id="powertrain" class="section active">
-<h2>POWERTRAIN</h2>
-<div class="grid">
-<div class="card">
-<h3>LAMBDA</h3>
-<div class="value" id="lambda">0.95</div>
-<div class="alert" id="lambdaAlert"></div>
-</div>
-<div class="card">
-<h3>ENGINE TEMP</h3>
-<div class="value" id="temp">85</div>
-<div class="alert" id="tempAlert"></div>
-</div>
-<div class="card">
-<h3>RPM</h3>
-<div class="value" id="rpm">4500</div>
-</div>
-<div class="card">
-<h3>LAMBDA TREND</h3>
-<canvas id="lambdaChart"></canvas>
-</div>
-</div>
+<div class="left">
+    <div class="car-number">49</div>
+    <div class="car-name">CV-49 RACER</div>
+    <div class="category">FORMULA SAE – OPEN</div>
+
+    <div class="speed" id="speed">67</div>
 </div>
 
-<!-- ELECTRICAL -->
-<div id="electrical" class="section">
-<h2>ELECTRICAL</h2>
-<div class="grid">
-<div class="card">
-<h3>BATTERY VOLTAGE</h3>
-<div class="value" id="voltage">12.5</div>
-<div class="alert" id="voltAlert"></div>
-</div>
-<div class="card">
-<h3>CURRENT DRAW (A)</h3>
-<div class="value" id="current">15</div>
-</div>
+<div class="telemetry">
+
+    <div class="card">
+        <span>G-FORCE</span>
+        <h3 id="gforce">1.8 G</h3>
+    </div>
+
+    <div class="card">
+        <span>THROTTLE</span>
+        <h3 id="throttle">78 %</h3>
+    </div>
+
+    <div class="card">
+        <span>ENGINE TEMP</span>
+        <h3 id="temp">82 °C</h3>
+    </div>
+
+    <div class="card">
+        <span>BATTERY</span>
+        <h3 id="battery">12.8 V</h3>
+    </div>
+
 </div>
 </div>
 
-<!-- SUSPENSION -->
-<div id="suspension" class="section">
-<h2>SUSPENSION LOAD (kg)</h2>
-<div class="grid">
-<div class="card"><h3>FRONT LEFT</h3><div class="value" id="fl">120</div></div>
-<div class="card"><h3>FRONT RIGHT</h3><div class="value" id="fr">118</div></div>
-<div class="card"><h3>REAR LEFT</h3><div class="value" id="rl">140</div></div>
-<div class="card"><h3>REAR RIGHT</h3><div class="value" id="rr">138</div></div>
-</div>
-</div>
-
-<!-- BRAKES -->
-<div id="brakes" class="section">
-<h2>BRAKE TEMP (°C)</h2>
-<div class="grid">
-<div class="card"><h3>FRONT</h3><div class="value" id="bf">320</div></div>
-<div class="card"><h3>REAR</h3><div class="value" id="br">290</div></div>
-</div>
-</div>
-
-<!-- IMU -->
-<div id="imu" class="section">
-<h2>VEHICLE DYNAMICS</h2>
-<div class="grid">
-<div class="card"><h3>LATERAL G</h3><div class="value" id="latg">1.2</div></div>
-<div class="card"><h3>LONGITUDINAL G</h3><div class="value" id="longg">0.8</div></div>
-<div class="card"><h3>YAW RATE</h3><div class="value" id="yaw">32</div></div>
-</div>
-</div>
-
-</div>
-
-<script>
-
-let lambdaChart;
-let labels=[],lambdaData=[];
-
-function showSection(id){
-document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-}
-
-lambdaChart=new Chart(document.getElementById("lambdaChart"),{
-type:"line",
-data:{labels:[],datasets:[{data:[],borderColor:"#00c2ff",tension:0.3}]},
-options:{responsive:true,maintainAspectRatio:false}
-});
-
-setInterval(()=>{
-
-let lambda=0.9+Math.random()*0.25;
-let temp=80+Math.random()*30;
-let rpm=3000+Math.random()*4000;
-let voltage=11+Math.random()*2;
-let current=10+Math.random()*10;
-
-document.getElementById("lambda").innerText=lambda.toFixed(2);
-document.getElementById("temp").innerText=Math.round(temp);
-document.getElementById("rpm").innerText=Math.round(rpm);
-document.getElementById("voltage").innerText=voltage.toFixed(2);
-document.getElementById("current").innerText=Math.round(current);
-
-document.getElementById("fl").innerText=Math.round(110+Math.random()*20);
-document.getElementById("fr").innerText=Math.round(110+Math.random()*20);
-document.getElementById("rl").innerText=Math.round(130+Math.random()*20);
-document.getElementById("rr").innerText=Math.round(130+Math.random()*20);
-
-document.getElementById("bf").innerText=Math.round(300+Math.random()*50);
-document.getElementById("br").innerText=Math.round(270+Math.random()*50);
-
-document.getElementById("latg").innerText=(Math.random()*2).toFixed(2);
-document.getElementById("longg").innerText=(Math.random()*2).toFixed(2);
-document.getElementById("yaw").innerText=Math.round(Math.random()*50);
-
-/* Alerts */
-if(lambda>1.1){
-document.getElementById("lambdaAlert").innerText="LEAN WARNING";
-document.getElementById("lambdaAlert").className="alert warning";
-}else{
-document.getElementById("lambdaAlert").innerText="";
-}
-
-if(temp>105){
-document.getElementById("tempAlert").innerText="OVERHEAT";
-document.getElementById("tempAlert").className="alert critical";
-}else{
-document.getElementById("tempAlert").innerText="";
-}
-
-if(voltage<11.5){
-document.getElementById("voltAlert").innerText="LOW VOLTAGE";
-document.getElementById("voltAlert").className="alert warning";
-}else{
-document.getElementById("voltAlert").innerText="";
-}
-
-/* Chart */
-let time=new Date().toLocaleTimeString();
-labels.push(time);
-lambdaData.push(lambda);
-if(labels.length>20){labels.shift();lambdaData.shift();}
-lambdaChart.data.labels=labels;
-lambdaChart.data.datasets[0].data=lambdaData;
-lambdaChart.update();
-
-},2000);
-
-</script>
-
-</body>
-</html>
+<div class="rpm-section">
+    <
