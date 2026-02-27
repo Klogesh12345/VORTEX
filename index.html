@@ -3,183 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAKTHI TELEMETRY - Vortex Pitwall | Formula Student</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@400;600;800&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>SAKTHI TELEMETRY | Vortex Pitwall</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --bg-primary: linear-gradient(135deg, #0a0a0a 0%, #1a0d1a 50%, #0f0f23 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-neon: #00ff88;
-            --accent-red: #ff4757;
-            --accent-blue: #3742fa;
-            --accent-orange: #ffa502;
-            --glow-neon: 0 0 20px rgba(0, 255, 136, 0.5);
-        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: var(--bg-primary), url('background.jpg') center/cover fixed; /* Your NEWWWWWWWW.jpg here */
-            color: white;
-            overflow-x: hidden;
-            animation: bgPulse 10s ease-in-out infinite alternate;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), 
+                        url('bg.jpg') center/cover fixed;
+            color: #fff; overflow: hidden;
+            background-size: cover; background-position: center;
         }
-        @keyframes bgPulse { 0% { filter: brightness(0.9) contrast(1); } 100% { filter: brightness(1.1) contrast(1.1); } }
         .header {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
+            position: absolute; top: 20px; left: 20px; right: 20px; z-index: 10;
+            display: flex; align-items: center; gap: 20px; 
+            font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900;
+            text-shadow: 0 0 10px #00ff88; background: rgba(0,0,0,0.5);
+            padding: 10px 20px; border-radius: 10px; backdrop-filter: blur(10px);
         }
-        .logo { font-family: 'Orbitron', monospace; font-size: 1.8rem; font-weight: 900; background: linear-gradient(45deg, var(--accent-neon), var(--accent-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 120px 2rem 2rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
-        .card {
-            background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 1.5rem; box-shadow: var(--glow-neon), inset 0 1px 0 rgba(255,255,255,0.1);
-            transition: all 0.3s ease; position: relative; overflow: hidden;
+        .main-content {
+            height: 100vh; display: flex; flex-direction: column; 
+            padding: 90px 20px 20px; gap: 20px; overflow-y: auto;
         }
-        .card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent); transform: rotate(45deg); transition: 0.5s; }
-        .card:hover::before { animation: shine 1s infinite; }
-        @keyframes shine { 0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); } 100% { transform: translateX(100%) translateY(100%) rotate(45deg); } }
-        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,255,136,0.3); }
-        .card h3 { font-family: 'Orbitron', monospace; font-size: 1.2rem; margin-bottom: 1rem; color: var(--accent-neon); display: flex; align-items: center; gap: 0.5rem; }
-        .gauge { width: 100%; height: 150px; position: relative; }
-        .gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-        .gauge circle { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 8; }
-        .gauge .progress { stroke: url(#gradient); stroke-linecap: round; stroke-width: 8; transition: stroke-dasharray 0.5s ease; }
-        .value { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 700; }
-        .chart-container { height: 200px; }
-        canvas { max-height: 200px; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .stat { text-align: center; }
-        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--accent-neon); }
-        .stat-label { font-size: 0.8rem; opacity: 0.8; }
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .section {
+            background: rgba(12,15,30,0.9); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.15); border-radius: 15px;
+            padding: 25px; flex: 1; min-height: 250px; position: relative;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .section h2 {
+            font-family: 'Orbitron', monospace; font-size: 22px; margin-bottom: 20px;
+            display: flex; align-items: center; gap: 12px; color: #00ff88;
+            text-shadow: 0 0 10px rgba(0,255,136,0.5);
+        }
+        .gauges { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
+            gap: 15px; margin-bottom: 20px; 
+        }
+        .gauge-item { 
+            text-align: center; background: rgba(0,0,0,0.4); 
+            border-radius: 10px; padding: 15px 10px; 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .gauge-value { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+        .gauge-label { font-size: 11px; opacity: 0.9; text-transform: uppercase; }
+        .charts-row { 
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; height: 110px; 
+        }
+        .chart-wrapper { position: relative; height: 100%; }
+        canvas { width: 100% !important; height: 100% !important; }
+        .download-btn {
+            position: absolute; bottom: 20px; right: 20px;
+            background: linear-gradient(45deg, #00ff88, #00cc66); color: #000;
+            border: none; padding: 10px 20px; border-radius: 25px;
+            font-weight: 600; cursor: pointer; font-size: 13px; font-family: 'Rajdhani';
+            box-shadow: 0 5px 20px rgba(0,255,136,0.4);
+            transition: all 0.3s ease;
+        }
+        .download-btn:hover { 
+            transform: translateY(-2px) scale(1.05); 
+            box-shadow: 0 8px 25px rgba(0,255,136,0.6);
+        }
+        .status-ok { color: #00ff88; }
+        .status-warn { color: #ffa502; }
+        .status-crit { color: #ff4757; }
+        @media (max-width: 768px) { 
+            .charts-row { grid-template-columns: 1fr; }
+            .gauges { grid-template-columns: repeat(2, 1fr); }
+        }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="logo">SAKTHI TELEMETRY <i class="fas fa-bolt"></i></div>
-        <div>Live Vortex Pitwall | FS 2026</div>
-    </header>
-    <div class="container">
-        <div class="grid">
-            <div class="card">
-                <h3><i class="fas fa-tachometer-alt"></i> Powertrain</h3>
-                <div class="gauge" id="rpmGauge">
-                    <svg viewBox="0 0 100 100">
-                        <defs>
-                            <linearGradient id="rpmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#ffaa00"/>
-                                <stop offset="50%" stop-color="#ff4757"/>
-                                <stop offset="100%" stop-color="#ff0040"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="50" cy="50" r="42" />
-                        <circle class="progress" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="263.89" stroke="url(#rpmGrad)"/>
-                    </svg>
-                    <div class="value" id="rpmValue">4500</div>
-                </div>
-                <div class="stats">
-                    <div class="stat"><div class="stat-value" id="tps">72</div><div class="stat-label">TPS %</div></div>
-                    <div class="stat"><div class="stat-value" id="lambda">0.92</div><div class="stat-label">Lambda</div></div>
-                </div>
-                <canvas class="chart-container" id="powerChart"></canvas>
-            </div>
-            <div class="card">
-                <h3><i class="fas fa-car-bump"></i> Suspension</h3>
-                <div class="stats">
-                    <div class="stat"><div class="stat-value" id="flSusp">320</div><div class="stat-label">FL mm</div></div>
-                    <div class="stat"><div class="stat-value" id="frSusp">330</div><div class="stat-label">FR mm</div></div>
-                    <div class="stat"><div class="stat-value" id="rlSusp">290</div><div class="stat-label">RL mm</div></div>
-                    <div class="stat"><div class="stat-value" id="rrSusp">300</div><div class="stat-label">RR mm</div></div>
-                </div>
-                <canvas class="chart-container" id="suspChart"></canvas>
-            </div>
-            <div class="card">
-                <h3><i class="fas fa-stopwatch"></i> Brakes</h3>
-                <div class="gauge" id="brakeGauge">
-                    <svg viewBox="0 0 100 100">
-                        <defs>
-                            <linearGradient id="brakeGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#00d4ff"/>
-                                <stop offset="100%" stop-color="#0099cc"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="50" cy="50" r="42" />
-                        <circle class="progress" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="263.89" stroke="url(#brakeGrad)"/>
-                    </svg>
-                    <div class="value" id="brakeValue">44</div>
-                </div>
-                <canvas class="chart-container" id="brakeChart"></canvas>
-            </div>
-            <div class="card">
-                <h3><i class="fas fa-bolt"></i> Electrical</h3>
-                <div class="stats">
-                    <div class="stat"><div class="stat-value" id="battery">85</div><div class="stat-label">SOC %</div></div>
-                    <div class="stat"><div class="stat-value" id="volt">14.2</div><div class="stat-label">Volt</div></div>
-                    <div class="stat"><div class="stat-value" id="current">320</div><div class="stat-label">Amp</div></div>
-                </div>
-                <canvas class="chart-container" id="elecChart"></canvas>
-            </div>
+    <div class="header">
+        <span style="font-size: 32px;">⚡</span>
+        <span>SAKTHI TELEMETRY</span>
+        <div style="margin-left: auto; font-size: 18px; font-weight: 500;" id="headerStats">
+            85 4500 72 3 92 98 95
         </div>
     </div>
+
+    <div class="main-content">
+        <!-- POWERTRAIN -->
+        <div class="section">
+            <h2>🔥 Powertrain</h2>
+            <div class="gauges">
+                <div class="gauge-item">
+                    <div class="gauge-value" data-id="rpm">4500</div>
+                    <div class="gauge-label">RPM</div>
+                </div>
+                <div class="gauge-item">
+                    <div class="gauge-value" data-id="tps">72</div>
+                    <div class="gauge-label">TPS %</div>
+                </div>
+                <div class="gauge-item">
+                    <div class="gauge-value" data-id="lambda">0.92</div>
+                    <div class="gauge-label">Lambda</div>
+                </div>
+            </div>
+            <div class="charts-row">
+                <div class="chart-wrapper"><canvas id="power1"></canvas></div>
+                <div class="chart-wrapper"><canvas id="power2"></canvas></div>
+                <div class="chart-wrapper"><canvas id="power3"></canvas></div>
+                <div class="chart-wrapper"><canvas id="power4"></canvas></div>
+            </div>
+            <button class="download-btn" onclick="downloadReport('Powertrain')">Download Report</button>
+        </div>
+
+        <!-- SUSPENSION -->
+        <div class="section">
+            <h2>🛠️ Suspension</h2>
+            <div class="gauges">
+                <div class="gauge-item"><div class="gauge-value" data-id="flSusp">320</div><div class="gauge-label">FL mm</div></div>
+                <div class="gauge-item"><div class="gauge-value" data-id="frSusp">330</div><div class="gauge-label">FR mm</div></div>
+                <div class="gauge-item"><div class="gauge-value" data-id="rlSusp">290</div><div class="gauge-label">RL mm</div></div>
+                <div class="gauge-item"><div class="gauge-value" data-id="rrSusp">300</div><div class="gauge-label">RR mm</div></div>
+            </div>
+            <div class="charts-row">
+                <div class="chart-wrapper"><canvas id="susp1"></canvas></div>
+                <div class="chart-wrapper"><canvas id="susp2"></canvas></div>
+                <div class="chart-wrapper"><canvas id="susp3"></canvas></div>
+                <div class="chart-wrapper"><canvas id="susp4"></canvas></div>
+            </div>
+            <button class="download-btn" onclick="downloadReport('Suspension')">Download Report</button>
+        </div>
+
+        <!-- BRAKES -->
+        <div class="section">
+            <h2>🛑 Brakes</h2>
+            <div class="gauges">
+                <div class="gauge-item"><div class="gauge-value" data-id="brakePress">44</div><div class="gauge-label">Press</div></div>
+                <div class="gauge-item"><div class="gauge-value" data-id="brakeTemp">340</div><div class="gauge-label">Temp °C</div></div>
+            </div>
+            <div class="charts-row">
+                <div class="chart-wrapper"><canvas id="brake1"></canvas></div>
+                <div class="chart-wrapper"><canvas id="brake2"></canvas></div>
+                <div class="chart-wrapper"><canvas id="brake3"></canvas></div>
+                <div class="chart-wrapper"><canvas id="brake4"></canvas></div>
+            </div>
+            <button class="download-btn" onclick="downloadReport('Brakes')">Download Report</button>
+        </div>
+
+        <!-- ELECTRICAL -->
+        <div class="section">
+            <h2>⚡ Electrical</h2>
+            <div class="gauges">
+                <div class="gauge-item"><div class="gauge-value status-ok" data-id="battSoc">85</div><div class="gauge-label">SOC %</div></div>
+                <div class="gauge-item"><div class="gauge-value" data-id="volt">14.2</div><div class="gauge-label">Volt</div></div>
+                <div class="gauge-item"><div class="gauge-value" data-id="current">320</div><div class="gauge-label">Amp</div></div>
+                <div class="gauge-item"><div class="gauge-value status-ok" data-id="status">OK</div><div class="gauge-label">Status</div></div>
+            </div>
+            <div class="charts-row">
+                <div class="chart-wrapper"><canvas id="elec1"></canvas></div>
+                <div class="chart-wrapper"><canvas id="elec2"></canvas></div>
+                <div class="chart-wrapper"><canvas id="elec3"></canvas></div>
+                <div class="chart-wrapper"><canvas id="elec4"></canvas></div>
+            </div>
+            <button class="download-btn" onclick="downloadReport('Electrical')">Download Report</button>
+        </div>
+    </div>
+
     <script>
-        // Simulated real-time data (replace with WebSocket/ESP32 fetch)
-        function updateData() {
+        // Real-time telemetry simulation (replace with ESP32 WebSocket)
+        const telemetryData = {
+            header: [85, 4500, 72, 3, 92, 98, 95],
+            powertrain: { rpm: 4500, tps: 72, lambda: 0.92 },
+            suspension: { fl: 320, fr: 330, rl: 290, rr: 300 },
+            brakes: { press: 44, temp: 340 },
+            electrical: { soc: 85, volt: 14.2, current: 320 }
+        };
+
+        function updateDisplay() {
             const data = {
-                rpm: 4500 + Math.sin(Date.now() * 0.001) * 2000,
-                tps: 72 + (Math.random() - 0.5) * 10,
-                lambda: 0.92 + (Math.random() - 0.5) * 0.1,
-                susp: [320, 330, 290, 300].map(v => v + (Math.random() - 0.5) * 5),
-                brake: 44 + Math.random() * 20,
-                battery: 85 + (Math.random() - 0.5) * 5,
-                volt: 14.2 + (Math.random() - 0.5) * 0.5,
-                current: 320 + (Math.random() - 0.5) * 50
+                rpm: telemetryData.powertrain.rpm + Math.sin(Date.now() * 0.001) * 800,
+                tps: telemetryData.powertrain.tps + (Math.random() - 0.5) * 8,
+                lambda: telemetryData.powertrain.lambda + (Math.random() - 0.5) * 0.08,
+                flSusp: telemetryData.suspension.fl + (Math.random() - 0.5) * 15,
+                frSusp: telemetryData.suspension.fr + (Math.random() - 0.5) * 15,
+                rlSusp: telemetryData.suspension.rl + (Math.random() - 0.5) * 15,
+                rrSusp: telemetryData.suspension.rr + (Math.random() - 0.5) * 15,
+                brakePress: telemetryData.brakes.press + Math.random() * 15,
+                brakeTemp: telemetryData.brakes.temp + Math.random() * 25,
+                battSoc: telemetryData.electrical.soc + (Math.random() - 0.5) * 3,
+                volt: telemetryData.electrical.volt + (Math.random() - 0.5) * 0.3,
+                current: telemetryData.electrical.current + (Math.random() - 0.5) * 40
             };
-            document.getElementById('rpmValue').textContent = Math.floor(data.rpm);
-            document.getElementById('tps').textContent = Math.floor(data.tps);
-            document.getElementById('lambda').textContent = data.lambda.toFixed(2);
-            ['flSusp', 'frSusp', 'rlSusp', 'rrSusp'].forEach((id, i) => document.getElementById(id).textContent = Math.floor(data.susp[i]));
-            document.getElementById('brakeValue').textContent = Math.floor(data.brake);
-            document.getElementById('battery').textContent = Math.floor(data.battery);
-            document.getElementById('volt').textContent = data.volt.toFixed(1);
-            document.getElementById('current').textContent = Math.floor(data.current);
-            updateGauges(data);
+
+            // Update gauges
+            document.querySelector('[data-id="rpm"]').textContent = Math.floor(data.rpm);
+            document.querySelector('[data-id="tps"]').textContent = Math.floor(data.tps);
+            document.querySelector('[data-id="lambda"]').textContent = data.lambda.toFixed(2);
+            document.querySelector('[data-id="flSusp"]').textContent = Math.floor(data.flSusp);
+            document.querySelector('[data-id="frSusp"]').textContent = Math.floor(data.frSusp);
+            document.querySelector('[data-id="rlSusp"]').textContent = Math.floor(data.rlSusp);
+            document.querySelector('[data-id="rrSusp"]').textContent = Math.floor(data.rrSusp);
+            document.querySelector('[data-id="brakePress"]').textContent = Math.floor(data.brakePress);
+            document.querySelector('[data-id="brakeTemp"]').textContent = Math.floor(data.brakeTemp);
+            document.querySelector('[data-id="battSoc"]').textContent = Math.floor(data.battSoc);
+            document.querySelector('[data-id="volt"]').textContent = data.volt.toFixed(1);
+            document.querySelector('[data-id="current"]').textContent = Math.floor(data.current);
+
+            // Update header
+            document.getElementById('headerStats').textContent = 
+                `${Math.floor(data.battSoc)} ${Math.floor(data.rpm)} ${Math.floor(data.tps)} 3 92 98 95`;
+
             updateCharts(data);
         }
-        function updateGauges(data) {
-            const rpmCirc = 263.89 * (data.rpm / 8500);
-            document.querySelector('#rpmGauge .progress').style.strokeDashoffset = 263.89 - rpmCirc;
-            const brakeCirc = 263.89 * (data.brake / 100);
-            document.querySelector('#brakeGauge .progress').style.strokeDashoffset = 263.89 - brakeCirc;
-        }
-        let powerChart, suspChart, brakeChart, elecChart;
+
+        const charts = {};
         function initCharts() {
-            const ctx1 = document.getElementById('powerChart').getContext('2d');
-            powerChart = new Chart(ctx1, { type: 'line', data: { labels: [], datasets: [{ label: 'RPM', borderColor: '#ff4757', data: [], tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false } }, plugins: { legend: { display: false } } } });
-            // Similar for other charts...
-            const ctx2 = document.getElementById('suspChart').getContext('2d');
-            suspChart = new Chart(ctx2, { type: 'line', data: { labels: [], datasets: [{ label: 'Susp', borderColor: '#00ff88', data: [], tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false } });
-            const ctx3 = document.getElementById('brakeChart').getContext('2d');
-            brakeChart = new Chart(ctx3, { type: 'line', data: { labels: [], datasets: [{ label: 'Brake Press', borderColor: '#3742fa', data: [], tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false } });
-            const ctx4 = document.getElementById('elecChart').getContext('2d');
-            elecChart = new Chart(ctx4, { type: 'line', data: { labels: [], datasets: [{ label: 'Current', borderColor: '#ffa502', data: [], tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false } });
+            const chartIds = ['power1','power2','power3','power4','susp1','susp2','susp3','susp4',
+                             'brake1','brake2','brake3','brake4','elec1','elec2','elec3','elec4'];
+            
+            chartIds.forEach(id => {
+                const canvas = document.getElementById(id);
+                charts[id] = new Chart(canvas, {
+                    type: 'line',
+                    data: { 
+                        labels: Array(20).fill(''), 
+                        datasets: [{
+                            data: Array(20).fill(Math.random() * 100),
+                            borderColor: '#00ff88',
+                            backgroundColor: 'rgba(0,255,136,0.1)',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: { 
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { display: false }, y: { display: false } },
+                        elements: { point: { radius: 0 } }
+                    }
+                });
+            });
         }
+
         function updateCharts(data) {
-            const time = new Date().toLocaleTimeString();
-            [powerChart, suspChart, brakeChart, elecChart].forEach((chart, i) => {
-                chart.data.labels.push(time);
-                chart.data.datasets[0].data.push(i === 0 ? data.rpm : i === 1 ? data.susp[0] : i === 2 ? data.brake : data.current);
-                if (chart.data.labels.length > 20) { chart.data.labels.shift(); chart.data.datasets[0].data.shift(); }
+            Object.values(charts).forEach(chart => {
+                chart.data.labels.push('');
+                chart.data.datasets[0].data.push(Math.random() * 100 + 20);
+                if (chart.data.labels.length > 20) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
                 chart.update('none');
             });
         }
+
+        function downloadReport(section) {
+            const report = `${section.toUpperCase()} TELEMETRY REPORT\n` +
+                          `Generated: ${new Date().toLocaleString()}\n` +
+                          `==================\n` +
+                          `Live data captured from Sakthi Racing Vortex Pitwall\n\n` +
+                          `Deployed: https://YOURUSERNAME.github.io/sakthi-telemetry`;
+            
+            const blob = new Blob([report], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `${section.toLowerCase()}_report_${Date.now()}.txt`; a.click();
+        }
+
+        // Initialize and start real-time updates
         initCharts();
-        setInterval(updateData, 500);
-        updateData();
+        updateDisplay();
+        setInterval(updateDisplay, 800);
     </script>
 </body>
 </html>
