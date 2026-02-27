@@ -16,7 +16,7 @@
 }
 
 body{
-    background:#0b0f16;
+    background:#0a0f1c;
     color:white;
     overflow-x:hidden;
 }
@@ -30,7 +30,7 @@ body{
     overflow:hidden;
 }
 
-/* BACKGROUND IMAGE */
+/* IMAGE */
 
 .bg-image{
     position:absolute;
@@ -42,13 +42,13 @@ body{
     z-index:-2;
 }
 
-/* DARK OVERLAY */
+/* LIGHT OVERLAY (LESS DARK) */
 
 .overlay{
     position:absolute;
     width:100%;
     height:100%;
-    background:linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.95));
+    background:linear-gradient(to bottom, rgba(0,20,40,0.3), rgba(0,0,0,0.6));
     z-index:-1;
 }
 
@@ -62,10 +62,10 @@ body{
 }
 
 .cv-badge{
-    border:2px solid #ff8c00;
+    border:2px solid #00f7ff;
     border-radius:50px;
     padding:6px 18px;
-    color:#ff8c00;
+    color:#00f7ff;
     font-weight:600;
 }
 
@@ -77,12 +77,13 @@ body{
 
 .best-lap span{
     font-size:13px;
-    color:#aaa;
+    color:#ccc;
 }
 
 .best-lap h2{
     font-size:28px;
     font-weight:800;
+    color:#00f7ff;
 }
 
 /* MAIN */
@@ -101,7 +102,8 @@ body{
 .car-number{
     font-size:160px;
     font-weight:800;
-    color:#ff8c00;
+    color:#00f7ff;
+    text-shadow:0 0 20px rgba(0,247,255,0.6);
     line-height:0.9;
 }
 
@@ -112,7 +114,7 @@ body{
 }
 
 .category{
-    color:#ff8c00;
+    color:#00f7ff;
     font-size:14px;
     margin-top:6px;
 }
@@ -121,6 +123,7 @@ body{
     font-size:120px;
     margin-top:60px;
     font-weight:700;
+    color:white;
 }
 
 /* TELEMETRY */
@@ -133,16 +136,17 @@ body{
 }
 
 .card{
-    background:rgba(20,25,35,0.85);
+    background:rgba(10,20,35,0.7);
     padding:25px;
     border-radius:15px;
-    backdrop-filter:blur(10px);
+    backdrop-filter:blur(8px);
+    border:1px solid rgba(0,247,255,0.3);
     transition:0.3s;
 }
 
 .card:hover{
     transform:translateY(-6px);
-    box-shadow:0 0 25px rgba(255,140,0,0.3);
+    box-shadow:0 0 25px rgba(0,247,255,0.5);
 }
 
 .card span{
@@ -153,9 +157,10 @@ body{
 .card h3{
     margin-top:10px;
     font-size:28px;
+    color:#00f7ff;
 }
 
-/* RPM BAR */
+/* RPM */
 
 .rpm-section{
     position:absolute;
@@ -172,7 +177,7 @@ body{
 .rpm-bar{
     height:18px;
     width:100%;
-    background:#222;
+    background:#111;
     border-radius:20px;
     overflow:hidden;
 }
@@ -180,7 +185,7 @@ body{
 .rpm-fill{
     height:100%;
     width:70%;
-    background:linear-gradient(to right, green, yellow, orange, red);
+    background:linear-gradient(to right, #00ff88, #00f7ff, #0077ff);
     border-radius:20px;
 }
 </style>
@@ -193,7 +198,7 @@ body{
     <!-- IMAGE -->
     <img src="145.jpeg" class="bg-image">
 
-    <!-- DARK OVERLAY -->
+    <!-- LIGHT OVERLAY -->
     <div class="overlay"></div>
 
     <div class="top-bar">
@@ -201,7 +206,7 @@ body{
             <div class="cv-badge">CV</div>
             <div>
                 <h3>SAKTHI RACING</h3>
-                <p style="font-size:13px;color:#aaa;">FORMULA SAE – OPEN</p>
+                <p style="font-size:13px;color:#ccc;">FORMULA SAE – OPEN</p>
             </div>
         </div>
 
