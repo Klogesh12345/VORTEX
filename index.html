@@ -3,531 +3,232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAKTHI Racing Telemetry</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<title>F1 Telemetry Dashboard</title>
 
-<!-- ============================================================
-     SUPABASE CONFIG — Replace these with YOUR Supabase credentials
-     1. Go to https://supabase.com → New Project (free)
-     2. Settings → API → copy URL and anon key
-     ============================================================ -->
-<script>
-  const SUPABASE_URL = 'https://bydkozqjehdziwfgchkj.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5ZGtvenFqZWhkeml3ZmdjaGtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1MDA4NTMsImV4cCI6MjA5MDA3Njg1M30.7WWbISSncLzf2AFB8xSAGPHBjWdQp7mqy7DTWvJYaVA';
-  const TABLE_NAME = 'telemetry';                                // table name in Supabase
-  const REFRESH_INTERVAL_MS = 1000;                             // fetch every 1 second
-</script>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root {
-  --bg:#080d1a;--bg2:#0d1525;--bg3:#0f1b2d;--bg4:#111f35;
-  --blue:#00a8ff;--cyan:#00e5ff;--green:#00ff88;
-  --red:#ff3355;--orange:#ff8c00;--yellow:#ffd600;
-  --text:#e8f4ff;--muted:#7a9cbd;--border:#1a3a5c;
+:root{
+  --red:#FF2D2D;
+  --deep-red:#A00000;
+  --bg:#0A0F1C;
+  --cyan:#00F5FF;
+  --orange:#FF6A00;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;display:flex;min-height:100vh;}
 
-/* CONNECTION STATUS BAR */
-.conn-bar{position:fixed;top:0;left:0;right:0;z-index:999;padding:6px 20px;font-family:'Share Tech Mono',monospace;font-size:11px;display:flex;align-items:center;gap:10px;background:rgba(8,13,26,0.95);border-bottom:1px solid var(--border);}
-.conn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite;}
-.conn-dot.online{background:var(--green);box-shadow:0 0 8px var(--green);}
-.conn-dot.offline{background:var(--red);box-shadow:0 0 8px var(--red);animation:none;}
-.conn-dot.connecting{background:var(--yellow);box-shadow:0 0 8px var(--yellow);}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-.conn-text{color:var(--muted);}
-.conn-time{margin-left:auto;color:var(--muted);}
+body{
+  margin:0;
+  font-family:'Orbitron', sans-serif;
+  background:var(--bg);
+  color:#EAF2FF;
+}
 
-/* SIDEBAR */
-.sidebar{width:180px;min-width:180px;background:linear-gradient(180deg,#0a1220,#060d18);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:50px 0 20px;position:sticky;top:0;height:100vh;}
-.sidebar-item{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;color:var(--muted);font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border-left:3px solid transparent;transition:all 0.3s;}
-.sidebar-item:hover,.sidebar-item.active{color:var(--cyan);border-left-color:var(--cyan);background:rgba(0,229,255,0.07);}
-.sidebar-icon{font-size:18px;width:22px;text-align:center;}
-.main{flex:1;overflow-y:auto;margin-top:32px;}
+/* Sidebar */
+.sidebar{
+  width:200px;
+  height:100vh;
+  position:fixed;
+  background:#0f1629;
+  padding:20px;
+}
+.sidebar div{
+  margin:20px 0;
+  cursor:pointer;
+}
 
-/* HERO */
-.hero{position:relative;width:100%;height:220px;overflow:hidden;background:linear-gradient(135deg,#060d18 0%,#0d1a2e 50%,#080d1a 100%);display:flex;align-items:center;justify-content:center;}
-.hero-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.05) 1px,transparent 1px);background-size:40px 40px;}
-.hero-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(0,168,255,0.12) 0%,transparent 60%);}
-.hero-title{position:relative;z-index:10;font-family:'Orbitron',monospace;font-size:32px;font-weight:900;letter-spacing:5px;text-shadow:0 0 30px rgba(0,229,255,0.6);text-align:center;}
-.hero-title em{color:var(--cyan);font-style:normal;font-weight:400;font-size:14px;letter-spacing:8px;display:block;margin-top:8px;}
-.hero-title small{display:block;font-size:10px;color:var(--muted);font-family:'Share Tech Mono',monospace;letter-spacing:3px;margin-top:6px;}
+/* Header */
+.header{
+  margin-left:200px;
+  padding:15px;
+  background:#111a30;
+  display:flex;
+  justify-content:space-between;
+}
 
-/* CONTENT */
-.content{padding:20px;display:flex;flex-direction:column;gap:20px;}
-.section{background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 4px 30px rgba(0,0,0,0.4);}
-.section-header{padding:12px 20px;background:linear-gradient(90deg,rgba(0,168,255,0.13),transparent 60%);border-bottom:1px solid var(--border);font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
-.section-body{padding:16px 20px;}
+.live{
+  color:var(--red);
+  animation:blink 1s infinite;
+}
+@keyframes blink{
+  50%{opacity:0;}
+}
 
-/* STATUS PILLS */
-.status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;font-weight:600;}
-.pill-ok{background:rgba(0,255,136,0.12);color:var(--green);border:1px solid rgba(0,255,136,0.4);}
-.pill-warn{background:rgba(255,140,0,0.12);color:var(--orange);border:1px solid rgba(255,140,0,0.4);}
-.pill-hot{background:rgba(255,51,85,0.12);color:var(--red);border:1px solid rgba(255,51,85,0.4);}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
-.dot-ok{background:var(--green);box-shadow:0 0 6px var(--green);}
-.dot-warn{background:var(--orange);box-shadow:0 0 6px var(--orange);}
-.dot-hot{background:var(--red);box-shadow:0 0 6px var(--red);}
+/* Dashboard */
+.main{
+  margin-left:200px;
+  padding:20px;
+}
 
-/* BIG METRICS */
-.big-metric-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
-.big-metric{flex:1;min-width:80px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;transition:border-color 0.3s;}
-.big-metric.updated{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,0.2);}
-.bm-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
-.bm-value{font-family:'Orbitron',monospace;font-size:22px;font-weight:700;line-height:1;transition:color 0.3s;}
-.bm-unit{font-size:10px;color:var(--muted);font-weight:400;}
-.bm-bar{height:3px;border-radius:2px;margin-top:4px;background:var(--border);overflow:hidden;}
-.bm-fill{height:100%;border-radius:2px;transition:width 0.5s ease;}
-.c-blue{color:var(--blue);}.c-cyan{color:var(--cyan);}.c-green{color:var(--green);}.c-red{color:var(--red);}.c-orange{color:var(--orange);}
-.f-blue{background:var(--blue);}.f-cyan{background:var(--cyan);}.f-green{background:var(--green);}.f-red{background:var(--red);}.f-orange{background:var(--orange);}
+.card{
+  background:rgba(255,255,255,0.05);
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 0 10px rgba(255,45,45,0.3);
+}
 
-/* FUSE GRID */
-.fuse-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
-.fuse-item{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.fuse-lbl{font-size:10px;color:var(--muted);font-family:'Share Tech Mono',monospace;}
-.fuse-badge{padding:4px 10px;border-radius:3px;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:1px;}
-.fuse-on{background:rgba(0,255,136,0.12);color:var(--green);border:1px solid var(--green);box-shadow:0 0 8px rgba(0,255,136,0.25);}
-.fuse-off{background:rgba(255,51,85,0.12);color:var(--red);border:1px solid var(--red);box-shadow:0 0 8px rgba(255,51,85,0.25);}
+/* Gauges */
+canvas{
+  display:block;
+  margin:auto;
+}
 
-/* EMBEDDED CARDS */
-.emb-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
-.emb-card{flex:1;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:14px 18px;display:flex;align-items:center;gap:14px;}
-.emb-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.ei-green{background:rgba(0,255,136,0.12);border:2px solid var(--green);box-shadow:0 0 10px rgba(0,255,136,0.35);}
-.ei-blue{background:rgba(0,168,255,0.12);border:2px solid var(--blue);box-shadow:0 0 10px rgba(0,168,255,0.35);}
-.emb-info h4{font-family:'Orbitron',monospace;font-size:12px;margin-bottom:3px;}
-.t-green{color:var(--green);font-size:12px;font-family:'Share Tech Mono',monospace;}
-.t-blue{color:var(--blue);font-size:12px;font-family:'Share Tech Mono',monospace;}
+/* Button */
+.btn{
+  padding:10px 15px;
+  background:linear-gradient(45deg,var(--red),var(--deep-red));
+  border:none;
+  color:white;
+  cursor:pointer;
+  border-radius:8px;
+  margin-top:10px;
+}
 
-/* NO DATA STATE */
-.no-data{text-align:center;padding:30px;color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:12px;}
-.no-data span{display:block;font-size:24px;margin-bottom:10px;}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-::-webkit-scrollbar-thumb:hover{background:var(--blue);}
+/* Modal */
+.modal{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+}
+.modal-content{
+  background:#111a30;
+  padding:20px;
+  border-radius:10px;
+}
 </style>
 </head>
+
 <body>
 
-<!-- CONNECTION STATUS BAR -->
-<div class="conn-bar">
-  <div class="conn-dot connecting" id="connDot"></div>
-  <span class="conn-text" id="connText">Connecting to database...</span>
-  <span class="conn-time" id="connTime">--:--:--</span>
+<div class="sidebar">
+  <div>Powertrain</div>
+  <div>Suspension</div>
+  <div>Brakes</div>
+  <div>Electrical</div>
+  <div>Telemetry</div>
 </div>
 
-<!-- SIDEBAR -->
-<nav class="sidebar">
-  <div class="sidebar-item active" onclick="showSection('powertrain',this)"><span class="sidebar-icon">⚙</span>Powertrain</div>
-  <div class="sidebar-item" onclick="showSection('suspension',this)"><span class="sidebar-icon">〰</span>Suspension</div>
-  <div class="sidebar-item" onclick="showSection('brakes',this)"><span class="sidebar-icon">◎</span>Brakes</div>
-  <div class="sidebar-item" onclick="showSection('electrical',this)"><span class="sidebar-icon">⚡</span>Electrical</div>
-  <div class="sidebar-item" onclick="showSection('embedded',this)"><span class="sidebar-icon">▣</span>Embedded</div>
-</nav>
+<div class="header">
+  <h2>Racing Telemetry Dashboard</h2>
+  <div class="live">● LIVE</div>
+</div>
 
 <div class="main">
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-bg-grid"></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-title">
-      VORTEX
-      <em>SAKTHI RACING</em>
-      <small>LIVE TELEMETRY SYSTEM</small>
-    </div>
+
+  <div class="card">
+    <h3>Speed</h3>
+    <canvas id="speedGauge" width="200" height="200"></canvas>
+    <button class="btn" onclick="openGraph()">View Graph</button>
   </div>
 
-  <div class="content">
+</div>
 
-    <!-- ===================== POWERTRAIN ===================== -->
-    <div class="section" id="sec-powertrain">
-      <div class="section-header">
-        ⚙ Powertrain
-        <span class="status-pill pill-ok" id="powertrain-status"><span class="dot dot-ok"></span>NOMINAL</span>
-      </div>
-      <div class="section-body">
-        <div class="big-metric-row">
-          <div class="big-metric" id="metric-rpm">
-            <div class="bm-label">Engine RPM</div>
-            <div class="bm-value c-cyan" id="val-rpm">--</div>
-            <div class="bm-unit">RPM</div>
-            <div class="bm-bar"><div class="bm-fill f-cyan" id="bar-rpm" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric" id="metric-coolant">
-            <div class="bm-label">Coolant Temp</div>
-            <div class="bm-value c-orange" id="val-coolant">--</div>
-            <div class="bm-unit">°C</div>
-            <div class="bm-bar"><div class="bm-fill f-orange" id="bar-coolant" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric" id="metric-oil_temp">
-            <div class="bm-label">Oil Temp</div>
-            <div class="bm-value c-red" id="val-oil_temp">--</div>
-            <div class="bm-unit">°C</div>
-            <div class="bm-bar"><div class="bm-fill f-red" id="bar-oil_temp" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric" id="metric-oil_pressure">
-            <div class="bm-label">Oil Pressure</div>
-            <div class="bm-value c-green" id="val-oil_pressure">--</div>
-            <div class="bm-unit">bar</div>
-            <div class="bm-bar"><div class="bm-fill f-green" id="bar-oil_pressure" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric" id="metric-throttle">
-            <div class="bm-label">Throttle</div>
-            <div class="bm-value c-blue" id="val-throttle">--</div>
-            <div class="bm-unit">%</div>
-            <div class="bm-bar"><div class="bm-fill f-blue" id="bar-throttle" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric" id="metric-gear">
-            <div class="bm-label">Gear</div>
-            <div class="bm-value c-yellow" id="val-gear" style="color:var(--yellow)">--</div>
-            <div class="bm-unit">ENGAGED</div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- Modal -->
+<div class="modal" id="graphModal">
+  <div class="modal-content">
+    <canvas id="chart"></canvas>
+    <br>
+    <button class="btn" onclick="downloadPNG()">Download PNG</button>
+    <button class="btn" onclick="downloadCSV()">Download CSV</button>
+    <button class="btn" onclick="closeGraph()">Close</button>
+  </div>
+</div>
 
-    <!-- ===================== SUSPENSION ===================== -->
-    <div class="section" id="sec-suspension" style="display:none">
-      <div class="section-header">
-        〰 Suspension
-        <span class="status-pill pill-ok" id="suspension-status"><span class="dot dot-ok"></span>NOMINAL</span>
-      </div>
-      <div class="section-body">
-        <div class="big-metric-row">
-          <div class="big-metric">
-            <div class="bm-label">Speed</div>
-            <div class="bm-value c-cyan" id="val-speed">--</div>
-            <div class="bm-unit">km/h</div>
-            <div class="bm-bar"><div class="bm-fill f-cyan" id="bar-speed" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">FL Damper</div>
-            <div class="bm-value c-blue" id="val-susp_fl">--</div>
-            <div class="bm-unit">mm</div>
-            <div class="bm-bar"><div class="bm-fill f-blue" id="bar-susp_fl" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">FR Damper</div>
-            <div class="bm-value c-blue" id="val-susp_fr">--</div>
-            <div class="bm-unit">mm</div>
-            <div class="bm-bar"><div class="bm-fill f-blue" id="bar-susp_fr" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">RL Damper</div>
-            <div class="bm-value c-blue" id="val-susp_rl">--</div>
-            <div class="bm-unit">mm</div>
-            <div class="bm-bar"><div class="bm-fill f-blue" id="bar-susp_rl" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">RR Damper</div>
-            <div class="bm-value c-blue" id="val-susp_rr">--</div>
-            <div class="bm-unit">mm</div>
-            <div class="bm-bar"><div class="bm-fill f-blue" id="bar-susp_rr" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">Lateral G</div>
-            <div class="bm-value c-orange" id="val-lat_g">--</div>
-            <div class="bm-unit">G</div>
-            <div class="bm-bar"><div class="bm-fill f-orange" id="bar-lat_g" style="width:0%"></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===================== BRAKES ===================== -->
-    <div class="section" id="sec-brakes" style="display:none">
-      <div class="section-header">
-        ◎ Brakes
-        <span class="status-pill pill-ok" id="brakes-status"><span class="dot dot-ok"></span>NOMINAL</span>
-      </div>
-      <div class="section-body">
-        <div class="big-metric-row">
-          <div class="big-metric">
-            <div class="bm-label">Brake Pressure FL</div>
-            <div class="bm-value c-red" id="val-brake_fl">--</div>
-            <div class="bm-unit">bar</div>
-            <div class="bm-bar"><div class="bm-fill f-red" id="bar-brake_fl" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">Brake Pressure FR</div>
-            <div class="bm-value c-red" id="val-brake_fr">--</div>
-            <div class="bm-unit">bar</div>
-            <div class="bm-bar"><div class="bm-fill f-red" id="bar-brake_fr" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">Brake Temp FL</div>
-            <div class="bm-value c-orange" id="val-braketemp_fl">--</div>
-            <div class="bm-unit">°C</div>
-            <div class="bm-bar"><div class="bm-fill f-orange" id="bar-braketemp_fl" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">Brake Temp FR</div>
-            <div class="bm-value c-orange" id="val-braketemp_fr">--</div>
-            <div class="bm-unit">°C</div>
-            <div class="bm-bar"><div class="bm-fill f-orange" id="bar-braketemp_fr" style="width:0%"></div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===================== ELECTRICAL ===================== -->
-    <div class="section" id="sec-electrical" style="display:none">
-      <div class="section-header">
-        ⚡ Electrical
-        <span class="status-pill pill-ok" id="electrical-status"><span class="dot dot-ok"></span>NOMINAL</span>
-      </div>
-      <div class="section-body">
-        <div class="big-metric-row">
-          <div class="big-metric">
-            <div class="bm-label">Battery Voltage</div>
-            <div class="bm-value c-green" id="val-battery_v">--</div>
-            <div class="bm-unit">V</div>
-            <div class="bm-bar"><div class="bm-fill f-green" id="bar-battery_v" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">Current Draw</div>
-            <div class="bm-value c-blue" id="val-current_a">--</div>
-            <div class="bm-unit">A</div>
-            <div class="bm-bar"><div class="bm-fill f-blue" id="bar-current_a" style="width:0%"></div></div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">ECU Temp</div>
-            <div class="bm-value c-orange" id="val-ecu_temp">--</div>
-            <div class="bm-unit">°C</div>
-            <div class="bm-bar"><div class="bm-fill f-orange" id="bar-ecu_temp" style="width:0%"></div></div>
-          </div>
-        </div>
-        <!-- Fuse Status -->
-        <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:12px;">FUSE STATUS</div>
-        <div class="fuse-grid">
-          <div class="fuse-item"><div class="fuse-lbl">ECU</div><div class="fuse-badge" id="fuse-ecu">--</div></div>
-          <div class="fuse-item"><div class="fuse-lbl">FUEL</div><div class="fuse-badge" id="fuse-fuel">--</div></div>
-          <div class="fuse-item"><div class="fuse-lbl">IGN</div><div class="fuse-badge" id="fuse-ign">--</div></div>
-          <div class="fuse-item"><div class="fuse-lbl">FAN</div><div class="fuse-badge" id="fuse-fan">--</div></div>
-          <div class="fuse-item"><div class="fuse-lbl">PUMP</div><div class="fuse-badge" id="fuse-pump">--</div></div>
-          <div class="fuse-item"><div class="fuse-lbl">DASH</div><div class="fuse-badge" id="fuse-dash">--</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===================== EMBEDDED ===================== -->
-    <div class="section" id="sec-embedded" style="display:none">
-      <div class="section-header">
-        ▣ Embedded Systems
-        <span class="status-pill pill-ok"><span class="dot dot-ok"></span>ONLINE</span>
-      </div>
-      <div class="section-body">
-        <div class="emb-row">
-          <div class="emb-card">
-            <div class="emb-icon ei-green">▣</div>
-            <div class="emb-info">
-              <h4>STM32 — Sensor Hub</h4>
-              <div class="t-green" id="stm32-status">● ACTIVE — Reading sensors</div>
-            </div>
-          </div>
-          <div class="emb-card">
-            <div class="emb-icon ei-blue">📡</div>
-            <div class="emb-info">
-              <h4>ESP32 — WiFi Gateway</h4>
-              <div class="t-blue" id="esp32-status">● Waiting for data...</div>
-            </div>
-          </div>
-        </div>
-        <div class="big-metric-row">
-          <div class="big-metric">
-            <div class="bm-label">Data Rate</div>
-            <div class="bm-value c-cyan" id="val-datarate">--</div>
-            <div class="bm-unit">packets/sec</div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">Last Update</div>
-            <div class="bm-value c-green" id="val-lastupdate" style="font-size:13px">--</div>
-            <div class="bm-unit">timestamp</div>
-          </div>
-          <div class="big-metric">
-            <div class="bm-label">Total Records</div>
-            <div class="bm-value c-blue" id="val-totalrecords">--</div>
-            <div class="bm-unit">in database</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- end content -->
-</div><!-- end main -->
-
-<!-- ============================================================
-     JAVASCRIPT — Supabase Database Integration
-     ============================================================ -->
 <script>
-// ---- Sidebar navigation ----
-function showSection(name, el) {
-  document.querySelectorAll('[id^="sec-"]').forEach(s => s.style.display = 'none');
-  document.getElementById('sec-' + name).style.display = 'block';
-  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
+// -------- Gauge --------
+const ctx = document.getElementById("speedGauge").getContext("2d");
+let speed = 0;
+
+function drawGauge(val){
+  ctx.clearRect(0,0,200,200);
+
+  ctx.beginPath();
+  ctx.arc(100,100,80,Math.PI,2*Math.PI);
+  ctx.strokeStyle="#333";
+  ctx.lineWidth=10;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(100,100,80,Math.PI,Math.PI + (val/200)*Math.PI);
+  ctx.strokeStyle="#00F5FF";
+  ctx.lineWidth=10;
+  ctx.shadowColor="#00F5FF";
+  ctx.shadowBlur=15;
+  ctx.stroke();
+
+  ctx.fillText(val+" km/h",60,110);
 }
 
-// ---- Clock ----
-function updateClock() {
-  document.getElementById('connTime').textContent = new Date().toLocaleTimeString();
-}
-setInterval(updateClock, 1000);
-updateClock();
+// simulate live data
+setInterval(()=>{
+  speed = Math.floor(Math.random()*200);
+  drawGauge(speed);
+  addData(speed);
+},1000);
 
-// ---- Update a metric value + bar ----
-function updateMetric(key, value, maxVal) {
-  const valEl = document.getElementById('val-' + key);
-  const barEl = document.getElementById('bar-' + key);
-  const metricEl = document.getElementById('metric-' + key);
+// -------- Chart --------
+let dataArr = [];
+let labels = [];
 
-  if (valEl && value !== undefined && value !== null) {
-    const display = typeof value === 'number' ? value.toFixed(1) : value;
-    valEl.textContent = display;
-
-    // flash update animation
-    if (metricEl) {
-      metricEl.classList.add('updated');
-      setTimeout(() => metricEl.classList.remove('updated'), 800);
-    }
+const chart = new Chart(document.getElementById("chart"), {
+  type: 'line',
+  data: {
+    labels: labels,
+    datasets: [{
+      label: 'Speed',
+      data: dataArr,
+      borderColor: '#00F5FF',
+      fill:true,
+    }]
   }
-  if (barEl && maxVal && typeof value === 'number') {
-    barEl.style.width = Math.min(100, (value / maxVal) * 100) + '%';
+});
+
+function addData(val){
+  if(dataArr.length>20){
+    dataArr.shift();
+    labels.shift();
   }
+  dataArr.push(val);
+  labels.push('');
+  chart.update();
 }
 
-// ---- Update fuse badge ----
-function updateFuse(key, value) {
-  const el = document.getElementById('fuse-' + key);
-  if (!el) return;
-  const isOn = value === 1 || value === true || value === 'ON';
-  el.textContent = isOn ? 'ON' : 'OFF';
-  el.className = 'fuse-badge ' + (isOn ? 'fuse-on' : 'fuse-off');
+// -------- Modal --------
+function openGraph(){
+  document.getElementById("graphModal").style.display="flex";
+}
+function closeGraph(){
+  document.getElementById("graphModal").style.display="none";
 }
 
-// ---- Set connection status ----
-function setStatus(state, msg) {
-  const dot = document.getElementById('connDot');
-  const text = document.getElementById('connText');
-  dot.className = 'conn-dot ' + state;
-  text.textContent = msg;
+// -------- Download --------
+function downloadPNG(){
+  const link = document.createElement('a');
+  link.href = chart.toBase64Image();
+  link.download = "graph.png";
+  link.click();
 }
 
-// ---- Render all data from latest DB row ----
-let packetCount = 0;
-let lastTimestamp = null;
+function downloadCSV(){
+  let csv = "Speed\n";
+  dataArr.forEach(d=>csv+=d+"\n");
 
-function renderData(row) {
-  if (!row) return;
-
-  packetCount++;
-
-  // POWERTRAIN
-  updateMetric('rpm',          row.rpm,          12000);
-  updateMetric('coolant',      row.coolant_temp,  120);
-  updateMetric('oil_temp',     row.oil_temp,      150);
-  updateMetric('oil_pressure', row.oil_pressure,  6);
-  updateMetric('throttle',     row.throttle,      100);
-  updateMetric('gear',         row.gear,          null);
-
-  // SUSPENSION
-  updateMetric('speed',   row.speed,   300);
-  updateMetric('susp_fl', row.susp_fl, 100);
-  updateMetric('susp_fr', row.susp_fr, 100);
-  updateMetric('susp_rl', row.susp_rl, 100);
-  updateMetric('susp_rr', row.susp_rr, 100);
-  updateMetric('lat_g',   row.lat_g,   4);
-
-  // BRAKES
-  updateMetric('brake_fl',     row.brake_fl,     60);
-  updateMetric('brake_fr',     row.brake_fr,     60);
-  updateMetric('braketemp_fl', row.braketemp_fl, 800);
-  updateMetric('braketemp_fr', row.braketemp_fr, 800);
-
-  // ELECTRICAL
-  updateMetric('battery_v', row.battery_v, 15);
-  updateMetric('current_a', row.current_a, 50);
-  updateMetric('ecu_temp',  row.ecu_temp,  100);
-
-  // FUSES
-  updateFuse('ecu',  row.fuse_ecu);
-  updateFuse('fuel', row.fuse_fuel);
-  updateFuse('ign',  row.fuse_ign);
-  updateFuse('fan',  row.fuse_fan);
-  updateFuse('pump', row.fuse_pump);
-  updateFuse('dash', row.fuse_dash);
-
-  // EMBEDDED stats
-  const ts = row.created_at || row.timestamp;
-  if (ts) {
-    const d = new Date(ts);
-    document.getElementById('val-lastupdate').textContent =
-      d.toLocaleTimeString();
-    document.getElementById('esp32-status').textContent =
-      '● ACTIVE — Last packet: ' + d.toLocaleTimeString();
-  }
-  document.getElementById('val-datarate').textContent = packetCount;
+  const blob = new Blob([csv], {type:'text/csv'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = "data.csv";
+  link.click();
 }
-
-// ============================================================
-// SUPABASE FETCH — polls for latest row every REFRESH_INTERVAL_MS
-// ============================================================
-async function fetchLatest() {
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?order=created_at.desc&limit=1`,
-      {
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-
-    const data = await res.json();
-    if (data && data.length > 0) {
-      setStatus('online', '● LIVE — Connected to Supabase database');
-      renderData(data[0]);
-
-      // Get total count
-      fetchCount();
-    } else {
-      setStatus('connecting', '⟳ Connected — Waiting for ESP32 data...');
-    }
-  } catch (err) {
-    setStatus('offline', '✗ Database error: ' + err.message + ' — Check SUPABASE_URL & KEY');
-  }
-}
-
-async function fetchCount() {
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?select=count`,
-      {
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-          'Prefer': 'count=exact'
-        }
-      }
-    );
-    const count = res.headers.get('content-range');
-    if (count) {
-      const total = count.split('/')[1];
-      document.getElementById('val-totalrecords').textContent = total;
-    }
-  } catch(e) {}
-}
-
-// Start polling
-fetchLatest();
-setInterval(fetchLatest, REFRESH_INTERVAL_MS);
 </script>
 
 </body>
